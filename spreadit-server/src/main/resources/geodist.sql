@@ -2,7 +2,7 @@ DROP PROCEDURE IF EXISTS geodist;
 DELIMITER $$
 
 # This procedure select all users within dist miles of the location of the user identified by userid (its server_id)
-CREATE PROCEDURE geodist (IN userid INT, IN dist INT) # dist in miles
+CREATE PROCEDURE geodist (IN userid INT, IN dist DOUBLE)
 BEGIN
 	DECLARE mylon DOUBLE;
 	DECLARE mylat DOUBLE;
