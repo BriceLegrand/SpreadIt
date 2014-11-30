@@ -40,6 +40,8 @@ proguard/
 # # TeXlipse plugin
 # .texlipse
 
+.metadata/
+
 #Intellij idea files
 .idea/
 *.iml
