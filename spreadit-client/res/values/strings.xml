@@ -4,7 +4,10 @@
     <string name="app_name">SpreadIt</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="historyBtn">Historique</string>
+    <string name="historyStr">Historique</string>
+    <string name="action_hide">Cacher le panel</string>
+    <string name="action_show">Afficher le panel</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="title_activity_history">HistoryActivity</string>
 
 </resources>

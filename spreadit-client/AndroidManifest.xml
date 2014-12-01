@@ -18,7 +18,11 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.spreadit.splash.SplashScreen"
+            android:name="com.spreadit.history.HistoryActivity"
+            android:label="@string/title_activity_history" >
+        </activity>
+        <activity
+            android:name=".splash.SplashScreen"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
             <intent-filter>
