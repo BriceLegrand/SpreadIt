@@ -1,4 +1,4 @@
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources>
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -9,18 +9,12 @@
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
-        -->
-        
+        -->        
     </style>
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
-         <item name="android:actionBarStyle">@style/SpreadItActionBarTheme</item>
-         <item name="android:windowActionBarOverlay">true</item>
-    </style>
-    
-    <style name="SpreadItActionBarTheme" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#e96d1f</item>
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
 </resources>
