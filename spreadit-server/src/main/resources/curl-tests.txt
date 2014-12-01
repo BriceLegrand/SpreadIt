@@ -1,0 +1,9 @@
+# Curl server tests
+# Download curl.exe at http://www.paehl.com/open_source/?CURL_7.39.0 (Download WITH SUPPORT SSL)
+
+.\curl.exe http://localhost:8080
+	--> return "SpreadIt server is working."
+.\curl.exe -d "gcm_id=trucbidule" http://localhost:8080/login
+	--> return "1" (server_id integer)
+.\curl.exe -d "server_id=1&msg=coucou les loulous" http://localhost:8080/send
+	--> return "Successfully msg="coucou les loulous" sent
