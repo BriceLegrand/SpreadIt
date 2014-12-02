@@ -8,21 +8,14 @@ import com.spreadit.R;
 
 import android.app.Activity;
 import android.app.ActionBar;
-import android.app.Fragment;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
-import android.view.GestureDetector;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.SlidingDrawer;
 import android.widget.TextView;
 
 public class RadarActivity extends Activity 
@@ -30,37 +23,40 @@ public class RadarActivity extends Activity
 	private SlidingUpPanelLayout mHistoryLayout;
 	
 	public static final String SAVED_STATE_ACTION_BAR_HIDDEN = "saved_state_action_bar_hidden";
-	private static final float ACTION_BAR_TITLE_SIZE = 37.0f;
 	private static final String ACTION_BAR_TITLE_FONT = "fonts/intriquescript.ttf";
+	private static final float ACTION_BAR_TITLE_SIZE = 37.0f;
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 		buildActionBar();
 		setContentView(R.layout.activity_radar);
 
 		mHistoryLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-		mHistoryLayout.setPanelSlideListener(new PanelSlideListener() {
+		mHistoryLayout.setPanelSlideListener(new PanelSlideListener() 
+		{
             @Override
-            public void onPanelSlide(View panel, float slideOffset) {
+            public void onPanelSlide(View panel, float slideOffset) 
+            {
                 setActionBarTranslation(mHistoryLayout.getCurrentParalaxOffset());
             }
 
             @Override
-            public void onPanelExpanded(View panel) {
-            }
+            public void onPanelExpanded(View panel) 
+            {}
 
             @Override
-            public void onPanelCollapsed(View panel) {
-            }
+            public void onPanelCollapsed(View panel) 
+            {}
 
             @Override
-            public void onPanelAnchored(View panel) {
-            }
+            public void onPanelAnchored(View panel) 
+            {}
 
             @Override
-            public void onPanelHidden(View panel) {
-            }
+            public void onPanelHidden(View panel) 
+            {}
         });
 		
         boolean actionBarHidden = savedInstanceState != null && savedInstanceState.getBoolean(SAVED_STATE_ACTION_BAR_HIDDEN, false);
@@ -69,11 +65,6 @@ public class RadarActivity extends Activity
             int actionBarHeight = getActionBarHeight();
             setActionBarTranslation(-actionBarHeight);//will "hide" an ActionBar
         }
-		
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}
 }
 	
 	@Override
@@ -112,8 +103,10 @@ public class RadarActivity extends Activity
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.radar, menu);
         MenuItem item = menu.findItem(R.id.action_toggle);
-        if (mHistoryLayout != null) {
-            if (mHistoryLayout.isPanelHidden()) {
+        if (mHistoryLayout != null) 
+        {
+            if (mHistoryLayout.isPanelHidden()) 
+            {
                 item.setTitle(R.string.action_show);
             } else {
                 item.setTitle(R.string.action_hide);
@@ -129,21 +122,27 @@ public class RadarActivity extends Activity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_toggle: {
+    public boolean onOptionsItemSelected(MenuItem item) 
+    {
+        switch (item.getItemId())
+        {
+            case R.id.action_toggle: 
+            {
                 if (mHistoryLayout != null) {
-                    if (!mHistoryLayout.isPanelHidden()) {
+                    if (!mHistoryLayout.isPanelHidden())
+                    {
                     	mHistoryLayout.hidePanel();
                         item.setTitle(R.string.action_show);
-                    } else {
+                    } else 
+                    {
                     	mHistoryLayout.showPanel();
                         item.setTitle(R.string.action_hide);
                     }
                 }
                 return true;
             }
-            case R.id.action_settings: {
+            case R.id.action_settings: 
+            {
     			return true;
     		}
         }
@@ -168,39 +167,27 @@ public class RadarActivity extends Activity
         // A hack to add the translation to the action bar
         ViewGroup content = ((ViewGroup) findViewById(android.R.id.content).getParent());
         int children = content.getChildCount();
-        for (int i = 0; i < children; i++) {
+        for (int i = 0; i < children; i++) 
+        {
             View child = content.getChildAt(i);
-            if (child.getId() != android.R.id.content) {
-                if (y <= -actionBarHeight) {
+            if (child.getId() != android.R.id.content) 
+            {
+                if (y <= -actionBarHeight)
+                {
                     child.setVisibility(View.GONE);
-                } else {
+                } else
+                {
                     child.setVisibility(View.VISIBLE);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) 
+                    {
                         child.setTranslationY(y);
-                    } else {
+                    } else
+                    {
                         AnimatorProxy.wrap(child).setTranslationY(y);
                     }
                 }
             }
         }
     }
-	
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_radar,
-					container, false);
-			return rootView;
-		}
-	}
 
 }
