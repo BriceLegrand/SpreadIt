@@ -21,7 +21,7 @@ BEGIN
 	SET lat2 = mylat+(dist/69);
 
 	# run the query:
-	SELECT server_id, gcm_id, phone_id,
+	SELECT server_id, gcm_id,
 	3956 * 2 * ASIN(SQRT( POWER(SIN((mylat - latitude) * pi()/180 / 2), 2) +COS(mylat * pi()/180) * COS(latitude * pi()/180) *POWER(SIN((mylon - longitude) * pi()/180 / 2), 2) )) AS distance
 	FROM user
 	WHERE server_id<>userid

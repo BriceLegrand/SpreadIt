@@ -1,16 +1,16 @@
 package spreadit;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.web.bind.annotation.*;
+
+import spreadit.GcmException;
+import spreadit.SqlHandler;
 
 import java.util.*;
 
@@ -57,8 +57,26 @@ public class SpreadItController {
 	@RequestMapping(value="/login", method=RequestMethod.POST)
     @ResponseBody
     public String login(@RequestParam("gcm_id") String gcm_id) {
-        String server_id = Integer.toString(add_gcm_id(gcm_id));
+        //String server_id = Integer.toString(add_gcm_id(gcm_id));
+		String server_id = Integer.toString(SqlHandler.login(gcm_id));
         out.println("/login : saved gcm_id="+gcm_id+" with server_id="+server_id);
+        return server_id;
+    }
+	
+	@RequestMapping(value="/logout", method=RequestMethod.POST)
+    @ResponseBody
+    public String logout(@RequestParam("server_id") String server_id) {
+		SqlHandler.logout(Integer.parseInt(server_id));
+        out.println("/logout : server_id="+server_id+" logged out");
+        return "server_id="+server_id+" logged out";
+    }
+
+	@RequestMapping(value="/location", method=RequestMethod.POST)
+    @ResponseBody
+    public String update_position(@RequestParam("server_id") String server_id,
+    		@RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude) {
+		SqlHandler.logout(Integer.parseInt(server_id));
+        out.println("/logout : server_id="+server_id+" logged out");
         return server_id;
     }
 

@@ -45,3 +45,9 @@ proguard/
 #Intellij idea files
 .idea/
 *.iml
+
+ECLIPSE BY ARTHUR :
+target
+.classpath
+.project
+.settings
