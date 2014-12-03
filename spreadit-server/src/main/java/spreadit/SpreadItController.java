@@ -65,21 +65,34 @@ public class SpreadItController {
 	
 	@RequestMapping(value="/logout", method=RequestMethod.POST)
     @ResponseBody
-    public String logout(@RequestParam("server_id") String server_id) {
-		SqlHandler.logout(Integer.parseInt(server_id));
+    public String logout(@RequestParam("server_id") int server_id) {
+		SqlHandler.logout(server_id);
         out.println("/logout : server_id="+server_id+" logged out");
         return "server_id="+server_id+" logged out";
     }
 
-	@RequestMapping(value="/location", method=RequestMethod.POST)
+	@RequestMapping(value="/position", method=RequestMethod.POST)
     @ResponseBody
-    public String update_position(@RequestParam("server_id") String server_id,
+    public String update_position(@RequestParam("server_id") int server_id,
     		@RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude) {
-		SqlHandler.logout(Integer.parseInt(server_id));
-        out.println("/logout : server_id="+server_id+" logged out");
-        return server_id;
+		
+		//TODO notify other users in the zone that they should update their list
+		String result;
+		try {
+			SqlHandler.update_location(server_id, latitude, longitude);
+	        out.println("/position : server_id="+server_id+" position updated");
+			result = "/position : server_id="+server_id+" position updated";
+		} catch (TtlSqlException e) {
+	        out.println("/position : server_id="+server_id+" "+e.getMessage());
+			result = e.getMessage();
+		}
+        return result;
     }
 
+	//TODO /reset_ttl
+	//TODO /users -> retrieve users within distance -> update everyone
+	
+	//TODO rewrite
     @RequestMapping(value="/send", method=RequestMethod.POST)
     @ResponseBody
     public String send(@RequestParam("server_id") int server_id, @RequestParam("msg") String msg) {

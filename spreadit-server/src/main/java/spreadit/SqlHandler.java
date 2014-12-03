@@ -130,7 +130,7 @@ public class SqlHandler {
 		try {
 			jdbcTemplate.queryForObject("SELECT server_id FROM user WHERE server_id=?", new Object[]{server_id}, Integer.class);
 		} catch (EmptyResultDataAccessException e) {
-			throw new TtlSqlException("Time to live expired for item server_id");
+			throw new TtlSqlException("Time to live expired");
 		}
 	}
 }
