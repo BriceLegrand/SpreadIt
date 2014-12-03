@@ -27,7 +27,7 @@ class RequestServerIdHttpTask extends AsyncTask<String, String, String> {
 	 * 
 	 * @see android.os.AsyncTask#doInBackground(Params[])
 	 */
-	public AsyncResponse delegate=null;
+	public AsyncResponse delegate = null;
 	
 	@Override
 	protected String doInBackground(String... params) {

@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -20,9 +22,7 @@ public class ComManager implements AsyncResponse {
 	public static final String EXTRA_MESSAGE = "message";
 	public static final String PROPERTY_REG_ID = "registration_id";
 	private static final String PROPERTY_APP_VERSION = "appVersion";
-	
-	
-	
+		
 	RequestServerIdHttpTask gcmIdhttpTask = new RequestServerIdHttpTask();
 	SendMessageHttpTask sendMsgHttpTask = new SendMessageHttpTask();
 
@@ -253,6 +253,4 @@ public class ComManager implements AsyncResponse {
 		editor.putInt(PROPERTY_APP_VERSION, appVersion);
 		editor.commit();
 	}
-
-
 }

@@ -1,7 +1,9 @@
 package com.example.spreadpocv2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +16,7 @@ public class MainActivity extends ActionBarActivity {
 	TextView mDisplay;
 	Button buttonOne;
 	EditText textEdit;
+	String currentMessage;
 	ComManager comManager = new ComManager();
 
 	@Override
@@ -26,11 +29,10 @@ public class MainActivity extends ActionBarActivity {
 		comManager.connectAndGetGcmId(MainActivity.this);
 		buttonOne = (Button) findViewById(R.id.button1);
 		buttonOne.setOnClickListener(new Button.OnClickListener() {
-		    public void onClick(View v) {
-		            comManager.sendMessage(textEdit.getText().toString());
-		    }
+			public void onClick(View v) {
+				comManager.sendMessage(textEdit.getText().toString());
+			}
 		});
-		
 	}
 
 	// You need to do the Play Services APK check here too.
@@ -59,8 +61,13 @@ public class MainActivity extends ActionBarActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void ReceivedMessage() {
-		// TODO : Treatment when a message is received from gcm servers
-	}
+	@Override
+	protected void onNewIntent(Intent intent) {
+		Log.d("MainActivity", "onNewIntent is called!");
+		currentMessage = intent.getStringExtra("msg");
+		mDisplay.setText(currentMessage);
+		super.onNewIntent(intent);
+	} // End of onNewIntent(Intent intent)
+	
 
 }
