@@ -8,48 +8,18 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.web.bind.annotation.*;
-
-import spreadit.GcmException;
-import spreadit.SqlHandler;
-
 import java.util.*;
-
 import static java.lang.System.out;
 
 @RestController
 public class SpreadItController {
-	
-	private static Map<Integer, String> gcm_ids = new HashMap<Integer, String>();
-    private static int current_index = 0;
-    // return server_id
-	private static synchronized int add_gcm_id(String gcm_id) {
-        for (Map.Entry<Integer, String> entry : gcm_ids.entrySet()) {
-            if (entry.getValue().equals(gcm_id)) {
-                return entry.getKey();
-            }
-        }
-        current_index++;
-        gcm_ids.put(current_index, gcm_id);
-        return current_index;
-	}
-    private static synchronized void remove_gcm_id(int server_id) {
-        gcm_ids.remove(server_id);
-    }
-    private static synchronized void remove_gcm_id(String gcm_id) {
-        for (Map.Entry<Integer, String> entry : gcm_ids.entrySet()) {
-            if (entry.getValue().equals(gcm_id)) {
-                gcm_ids.remove(entry.getKey());
-                return;
-            }
-        }
-    }
-    private static synchronized String get_gcm_id(int server_id) {
-        return gcm_ids.get(server_id);
-    }
-	
+
+    //TODO document API precisely
+
     @RequestMapping("/")
     @ResponseBody
     public String index() {
+        SqlHandler.create_tables();
         return "SpreadIt server is working.";
     }
 
@@ -57,7 +27,6 @@ public class SpreadItController {
 	@RequestMapping(value="/login", method=RequestMethod.POST)
     @ResponseBody
     public String login(@RequestParam("gcm_id") String gcm_id) {
-        //String server_id = Integer.toString(add_gcm_id(gcm_id));
 		String server_id = Integer.toString(SqlHandler.login(gcm_id));
         out.println("/login : saved gcm_id="+gcm_id+" with server_id="+server_id);
         return server_id;
@@ -89,22 +58,59 @@ public class SpreadItController {
         return result;
     }
 
-	//TODO /reset_ttl
-	//TODO /users -> retrieve users within distance -> update everyone
+    // Returns the server ID
+    @RequestMapping(value="/reset_ttl", method=RequestMethod.POST)
+    @ResponseBody
+    public String reset_ttl(@RequestParam("server_id") int server_id) {
+        try {
+            SqlHandler.reset_ttl_if_living(server_id);
+        }
+        catch (TtlSqlException e) {
+            out.println("/reset_ttl : "+e.getMessage()+" for server_id="+server_id);
+            return e.getMessage()+" for server_id="+server_id;
+        }
+
+        out.println("/reset_ttl : success for server_id="+server_id);
+        return "Success reset_ttl for server_id="+server_id;
+    }
+
+    @RequestMapping("/users")
+    @ResponseBody
+    public String users(@RequestParam("server_id") int server_id) {
+        List<User> users;
+        try {
+            users = SqlHandler.retrieve_users(server_id, Application.rayon_diffusion_km);
+        }
+        catch (TtlSqlException e) {
+            out.println("/users : "+e.getMessage()+" for server_id="+server_id);
+            return e.getMessage()+" for server_id="+server_id;
+        }
+
+        StringBuilder usersBuilder = new StringBuilder();
+        for (User user : users) {
+            usersBuilder.append(user.getServer_id());
+            usersBuilder.append(",");
+        }
+        usersBuilder.setLength(usersBuilder.length() - 1); // remove last comma
+
+        out.println("/users : success for server_id="+server_id);
+        return usersBuilder.toString();
+    }
 	
-	//TODO rewrite
     @RequestMapping(value="/send", method=RequestMethod.POST)
     @ResponseBody
     public String send(@RequestParam("server_id") int server_id, @RequestParam("msg") String msg) {
-        String gcm_id = get_gcm_id(server_id);
-        if (gcm_id==null) {
-            out.println("/send : Failure with server_id="+server_id+" not logged in (<=>no gcm_id saved)");
-            return "Failure : server_id="+server_id+" not logged in (<=>no gcm_id saved)";
+        String gcm_id;
+        try {
+            gcm_id = SqlHandler.get_gcm_id(server_id);
+        }
+        catch (TtlSqlException e) {
+            out.println("/users : "+e.getMessage()+" for server_id="+server_id);
+            return e.getMessage()+" for server_id="+server_id;
         }
 
-
         try {
-            sendMsgToGcm(gcm_ids.values(), msg);
+            sendMsgToGcm(SqlHandler.retrieve_users(server_id, Application.rayon_diffusion_km), msg);
             out.println("/send : Successfully msg=\""+msg+"\" sent");
             return "Successfully msg=\""+msg+"\" sent";
         }
@@ -113,6 +119,10 @@ public class SpreadItController {
             out.println(e.getMessage());
             out.println("/send : Failure of the HTTP response from GCM servers");
             return "Failure of the HTTP response to GCM servers";
+        }
+        catch (TtlSqlException e) {
+            out.println("/send : "+e.getMessage()+" for server_id="+server_id);
+            return e.getMessage()+" for server_id="+server_id;
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -123,7 +133,9 @@ public class SpreadItController {
     }
 
 
-    private static void sendMsgToGcm(Collection<String> gcm_ids, String msg) throws Exception {
+    private static void sendMsgToGcm(Collection<User> users, String msg) throws Exception {
+        if (users==null || users.isEmpty()) return;
+
         CloseableHttpClient client = null;
         try {
             client = HttpClients.createDefault();
@@ -134,9 +146,9 @@ public class SpreadItController {
 
             StringBuilder jsonBuilder = new StringBuilder();
             jsonBuilder.append("{ \"registration_ids\" : [");
-            for (String gcm_id : gcm_ids) {
+            for (User user : users) {
                 jsonBuilder.append("\"");
-                jsonBuilder.append(gcm_id);
+                jsonBuilder.append(user.getGcm_id());
                 jsonBuilder.append("\",");
             }
             jsonBuilder.setLength(jsonBuilder.length() - 1); // remove last comma
