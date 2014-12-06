@@ -5,7 +5,7 @@
 
 	<groupId>spreadit</groupId>
 	<artifactId>spreadit-server</artifactId>
-	<version>0.1</version>
+	<version>POC2</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
