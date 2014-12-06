@@ -1,10 +1,11 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.spreadit.RadarActivity"
     tools:ignore="MergeRootFrame" >
+
 
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
@@ -19,22 +20,41 @@
 
         <!-- MAIN CONTENT -->
 
-        <LinearLayout
+       <RelativeLayout
+            android:id="@+id/mainContent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingTop="?android:attr/actionBarSize" >
 
-            <TextView
-                android:id="@+id/main"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clickable="true"
-                android:focusable="false"
-                android:focusableInTouchMode="true"
-                android:gravity="center"
-                android:text="Main Content"
-                android:textSize="16sp" />
-        </LinearLayout>
+            <Button
+                android:id="@+id/btnNewMsg"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="69dp"
+                android:layout_height="69dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:adjustViewBounds="true"
+                android:background="@drawable/button_add_msg"
+                android:scaleType="fitXY"
+                android:src="@drawable/button_add_msg"/>
+
+            <EditText
+                android:id="@+id/txtNewMsg"
+                android:layout_width="fill_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/btnNewMsg"
+                android:drawableStart="@drawable/logo_mini"
+                android:ems="10"
+                android:hint="@string/msgHint"
+                android:singleLine="true"
+                android:textColor="#000000"
+                android:textSize="16sp" >
+
+                <requestFocus />
+            </EditText>
+
+        </RelativeLayout>
 
         <!-- SLIDING LAYOUT -->
 
@@ -66,4 +86,4 @@
         </LinearLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
-</FrameLayout>
+</RelativeLayout>
