@@ -10,5 +10,6 @@
     <string name="action_show">Afficher le panel</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
     <string name="title_activity_history">HistoryActivity</string>
+    <string name="msgHint">Message SpreadIt</string>
 
 </resources>
