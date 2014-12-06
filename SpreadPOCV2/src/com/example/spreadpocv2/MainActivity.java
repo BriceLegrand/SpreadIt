@@ -27,6 +27,7 @@ public class MainActivity extends ActionBarActivity {
 		mDisplay = (TextView) findViewById(R.id.display);
 		textEdit = (EditText) findViewById(R.id.editText1);
 		comManager.connectAndGetGcmId(MainActivity.this);
+		mDisplay.setText(comManager.getRegid());
 		buttonOne = (Button) findViewById(R.id.button1);
 		buttonOne.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View v) {

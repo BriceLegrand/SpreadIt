@@ -23,8 +23,8 @@ public class ComManager implements AsyncResponse {
 	public static final String PROPERTY_REG_ID = "registration_id";
 	private static final String PROPERTY_APP_VERSION = "appVersion";
 		
-	RequestServerIdHttpTask gcmIdhttpTask = new RequestServerIdHttpTask();
-	SendMessageHttpTask sendMsgHttpTask = new SendMessageHttpTask();
+	RequestServerIdHttpTask gcmIdhttpTask;
+	SendMessageHttpTask sendMsgHttpTask;
 
 	/**
 	 * Substitute you own sender ID here. This is the project number you got
@@ -39,24 +39,35 @@ public class ComManager implements AsyncResponse {
 	AtomicInteger msgId = new AtomicInteger();
 	SharedPreferences prefs;
 	String regid;	
-	String server_id;
+	String serverId;
+
+	public String getRegid() {
+		return regid;
+	}
+
+	public void setRegid(String regid) {
+		this.regid = regid;
+	}
+
 
 	public void sendRegIdToServer(String gcm_id) {
 		Log.d("tag", "sendRegIdToServer called with reg id " +  gcm_id);
+		gcmIdhttpTask = new RequestServerIdHttpTask();
 		gcmIdhttpTask.delegate = this;
-		gcmIdhttpTask.execute("http://89.88.245.68:8080/login", gcm_id);
+		gcmIdhttpTask.execute("http://192.168.1.19:8080/login", gcm_id);
 	}
 
 	public void sendMessage(String message) {
+		sendMsgHttpTask = new SendMessageHttpTask();
 		sendMsgHttpTask.delegate = this;
-		sendMsgHttpTask.execute("http://89.88.245.68:8080/send", server_id, message);
+		sendMsgHttpTask.execute("http://192.168.1.19:8080/send", serverId, message);
 	}
 
 	public void processReqServIdFinish(String serverId) {
 		// this you will received result fired from async class of
 		// onPostExecute(result) method.
 		Log.d("tag", "http result from process Finish " + serverId);
-		this.setServer_id(server_id);
+		this.setServer_id(serverId);
 	}
 
 	
@@ -67,11 +78,11 @@ public class ComManager implements AsyncResponse {
 	}
 	
 	public String getServer_id() {
-		return server_id;
+		return serverId;
 	}
 
 	public void setServer_id(String server_id) {
-		this.server_id = server_id;
+		this.serverId = server_id;
 	}
 	
 	public void connectAndGetGcmId(Activity act) {
