@@ -67,6 +67,6 @@ class SendMessageHttpTask extends AsyncTask<String, String, String> {
 		super.onPostExecute(result);
 		// Do anything with response..
 		Log.d("tag", "Message sended");
-	    delegate.processFinish();		
+	    delegate.processSendMessageFinish();		
 	}
 }

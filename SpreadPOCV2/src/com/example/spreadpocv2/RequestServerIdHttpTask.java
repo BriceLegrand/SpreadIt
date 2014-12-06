@@ -64,8 +64,6 @@ class RequestServerIdHttpTask extends AsyncTask<String, String, String> {
 	@Override
 	protected void onPostExecute(String result) {
 		super.onPostExecute(result);
-		// Do anything with response..
-		Log.d("tag", "httpresponse : " + result);
 	    delegate.processReqServIdFinish(result);		
 	}
 }

@@ -13,11 +13,11 @@ import android.widget.TextView;
 
 public class MainActivity extends ActionBarActivity {
 
-	TextView mDisplay;
-	Button buttonOne;
-	EditText textEdit;
-	String currentMessage;
-	ComManager comManager = new ComManager();
+	private TextView mDisplay;
+	private Button buttonOne;
+	private EditText textEdit;
+	private String currentMessage;
+	private ComManager comManager = new ComManager();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +61,11 @@ public class MainActivity extends ActionBarActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
+	/*
+	 * When a push message is arrived, MessageReceiver call MainActivity activity with a new intent,
+	 * including the value of the message received
+	 * 	 * @see android.support.v4.app.FragmentActivity#onNewIntent(android.content.Intent)
+	 */
 	@Override
 	protected void onNewIntent(Intent intent) {
 		Log.d("MainActivity", "onNewIntent is called!");

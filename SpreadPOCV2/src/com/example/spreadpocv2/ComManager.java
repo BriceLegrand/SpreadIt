@@ -17,12 +17,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-public class ComManager implements AsyncResponse {	
+public class ComManager implements AsyncResponse {
 	private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 	public static final String EXTRA_MESSAGE = "message";
 	public static final String PROPERTY_REG_ID = "registration_id";
 	private static final String PROPERTY_APP_VERSION = "appVersion";
-		
+
 	RequestServerIdHttpTask gcmIdhttpTask;
 	SendMessageHttpTask sendMsgHttpTask;
 
@@ -34,24 +34,15 @@ public class ComManager implements AsyncResponse {
 
 	static final String TAG = "GCMDemo";
 
-	Context context;
-	GoogleCloudMessaging gcm;
-	AtomicInteger msgId = new AtomicInteger();
-	SharedPreferences prefs;
-	String regid;	
-	String serverId;
-
-	public String getRegid() {
-		return regid;
-	}
-
-	public void setRegid(String regid) {
-		this.regid = regid;
-	}
-
+	private Context context;
+	private GoogleCloudMessaging gcm;
+	private AtomicInteger msgId = new AtomicInteger();
+	private SharedPreferences prefs;
+	private String regid;
+	private String serverId;
 
 	public void sendRegIdToServer(String gcm_id) {
-		Log.d("tag", "sendRegIdToServer called with reg id " +  gcm_id);
+		Log.d("tag", "sendRegIdToServer called with reg id " + gcm_id);
 		gcmIdhttpTask = new RequestServerIdHttpTask();
 		gcmIdhttpTask.delegate = this;
 		gcmIdhttpTask.execute("http://192.168.1.19:8080/login", gcm_id);
@@ -60,31 +51,26 @@ public class ComManager implements AsyncResponse {
 	public void sendMessage(String message) {
 		sendMsgHttpTask = new SendMessageHttpTask();
 		sendMsgHttpTask.delegate = this;
-		sendMsgHttpTask.execute("http://192.168.1.19:8080/send", serverId, message);
+		sendMsgHttpTask.execute("http://192.168.1.19:8080/send", serverId,
+				message);
 	}
 
 	public void processReqServIdFinish(String serverId) {
 		// this you will received result fired from async class of
-		// onPostExecute(result) method.
+		// onPostExecute(result) method of RequestServerIdHttpTask.
 		Log.d("tag", "http result from process Finish " + serverId);
 		this.setServer_id(serverId);
 	}
 
-	
-	public void processFinish() {
+	public void processSendMessageFinish() {
 		// this you will received result fired from async class of
-		// onPostExecute() method.
-		Log.d("tag", "http result from processFinish, no data returned");
-	}
-	
-	public String getServer_id() {
-		return serverId;
+		// onPostExecute() method of SendMessageHttpTask.
+		Log.d("tag", "Message successfully sent");
 	}
 
-	public void setServer_id(String server_id) {
-		this.serverId = server_id;
-	}
-	
+	/*
+	 * Method called when the application is launched
+	 */
 	public void connectAndGetGcmId(Activity act) {
 		// Check device for Play Services APK.
 		if (checkPlayServices(act)) {
@@ -95,17 +81,15 @@ public class ComManager implements AsyncResponse {
 
 			if (regid.isEmpty()) {
 				Log.d(TAG, "is empty");
-				registerInBackground();			
+				registerInBackground();
 			} else {
 				sendRegIdToServer(regid);
 			}
-			
-			
+
 		} else {
 			Log.i(TAG, "No valid Google Play Services APK found.");
 		}
 	}
-	
 
 	/**
 	 * Check the device to make sure it has the Google Play Services APK. If it
@@ -143,7 +127,6 @@ public class ComManager implements AsyncResponse {
 			Log.i(TAG, "Registration not found.");
 			return "";
 		}
-		Log.d("ttag", "reg id from preferences" + registrationId);
 		// Check if app was updated; if so, it must clear the registration ID
 		// since the existing regID is not guaranteed to work with the new
 		// app version.
@@ -165,8 +148,7 @@ public class ComManager implements AsyncResponse {
 		// but
 		// how you store the regID in your app is up to you.
 		return SpreadPOCV2.getAppContext().getSharedPreferences(
-				MainActivity.class.getSimpleName(),
-				Context.MODE_PRIVATE);
+				MainActivity.class.getSimpleName(), Context.MODE_PRIVATE);
 	}
 
 	/**
@@ -174,8 +156,11 @@ public class ComManager implements AsyncResponse {
 	 */
 	private static int getAppVersion(Context context) {
 		try {
-			PackageInfo packageInfo = SpreadPOCV2.getAppContext().getPackageManager()
-					.getPackageInfo(SpreadPOCV2.getAppContext().getPackageName(), 0);
+			PackageInfo packageInfo = SpreadPOCV2
+					.getAppContext()
+					.getPackageManager()
+					.getPackageInfo(
+							SpreadPOCV2.getAppContext().getPackageName(), 0);
 			return packageInfo.versionCode;
 		} catch (NameNotFoundException e) {
 			// should never happen
@@ -183,8 +168,10 @@ public class ComManager implements AsyncResponse {
 		}
 	}
 
+/*
+ * Inner class responsible of the registration in an AsyncTask	
+ */
 	public class Register extends AsyncTask<String, String, String> {
-
 		@Override
 		protected String doInBackground(String... params) {
 			String msg = "";
@@ -236,12 +223,6 @@ public class ComManager implements AsyncResponse {
 		reg.execute();
 	}
 
-	/**
-	 * Sends the registration ID to your server over HTTP, so it can use
-	 * GCM/HTTP or CCS to send messages to your app. Not needed for this demo
-	 * since the device sends upstream messages to a server that echoes back the
-	 * message using the 'from' address in the message.
-	 */
 	private void sendRegistrationIdToBackend() {
 		// Your implementation here.
 	}
@@ -263,5 +244,21 @@ public class ComManager implements AsyncResponse {
 		editor.putString(PROPERTY_REG_ID, regId);
 		editor.putInt(PROPERTY_APP_VERSION, appVersion);
 		editor.commit();
+	}
+
+	public String getServer_id() {
+		return serverId;
+	}
+
+	public void setServer_id(String server_id) {
+		this.serverId = server_id;
+	}
+
+	public String getRegid() {
+		return regid;
+	}
+
+	public void setRegid(String regid) {
+		this.regid = regid;
 	}
 }
