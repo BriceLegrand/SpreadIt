@@ -13,6 +13,7 @@ public class Application {
 
     public static final double rayon_diffusion_km = 1.0;
     public static final int time_to_live_min = 15;
+    public static final int msg_max_characters = 140;
 
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(Application.class, args);

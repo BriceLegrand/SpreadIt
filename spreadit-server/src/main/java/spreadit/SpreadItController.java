@@ -14,8 +14,6 @@ import static java.lang.System.out;
 @RestController
 public class SpreadItController {
 
-    //TODO document API precisely
-
     @RequestMapping("/")
     @ResponseBody
     public String index() {
@@ -26,7 +24,7 @@ public class SpreadItController {
     // Returns the server ID
 	@RequestMapping(value="/login", method=RequestMethod.POST)
     @ResponseBody
-    public String login(@RequestParam("gcm_id") String gcm_id) {
+    public String login(@RequestParam("gcm_id") final String gcm_id) {
 		String server_id = Integer.toString(SqlHandler.login(gcm_id));
         out.println("/login : saved gcm_id="+gcm_id+" with server_id="+server_id);
         return server_id;
@@ -34,7 +32,7 @@ public class SpreadItController {
 	
 	@RequestMapping(value="/logout", method=RequestMethod.POST)
     @ResponseBody
-    public String logout(@RequestParam("server_id") int server_id) {
+    public String logout(@RequestParam("server_id") final int server_id) {
 		SqlHandler.logout(server_id);
         out.println("/logout : server_id="+server_id+" logged out");
         return "server_id="+server_id+" logged out";
@@ -42,15 +40,15 @@ public class SpreadItController {
 
 	@RequestMapping(value="/position", method=RequestMethod.POST)
     @ResponseBody
-    public String update_position(@RequestParam("server_id") int server_id,
-    		@RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude) {
+    public String update_position(@RequestParam("server_id") final int server_id,
+    		@RequestParam("latitude") final double latitude, @RequestParam("longitude") final double longitude) {
 		
 		//TODO notify other users in the zone that they should update their list
 		String result;
 		try {
 			SqlHandler.update_location(server_id, latitude, longitude);
 	        out.println("/position : server_id="+server_id+" position updated");
-			result = "/position : server_id="+server_id+" position updated";
+			result = "server_id="+server_id+" position updated";
 		} catch (TtlSqlException e) {
 	        out.println("/position : server_id="+server_id+" "+e.getMessage());
 			result = e.getMessage();
@@ -61,13 +59,13 @@ public class SpreadItController {
     // Returns the server ID
     @RequestMapping(value="/reset_ttl", method=RequestMethod.POST)
     @ResponseBody
-    public String reset_ttl(@RequestParam("server_id") int server_id) {
+    public String reset_ttl(@RequestParam("server_id") final int server_id) {
         try {
             SqlHandler.reset_ttl_if_living(server_id);
         }
         catch (TtlSqlException e) {
             out.println("/reset_ttl : "+e.getMessage()+" for server_id="+server_id);
-            return e.getMessage()+" for server_id="+server_id;
+            return e.getMessage();
         }
 
         out.println("/reset_ttl : success for server_id="+server_id);
@@ -76,14 +74,14 @@ public class SpreadItController {
 
     @RequestMapping("/users")
     @ResponseBody
-    public String users(@RequestParam("server_id") int server_id) {
+    public String users(@RequestParam("server_id") final int server_id) {
         List<User> users;
         try {
             users = SqlHandler.retrieve_users(server_id, Application.rayon_diffusion_km);
         }
         catch (TtlSqlException e) {
             out.println("/users : "+e.getMessage()+" for server_id="+server_id);
-            return e.getMessage()+" for server_id="+server_id;
+            return e.getMessage();
         }
 
         StringBuilder usersBuilder = new StringBuilder();
@@ -99,26 +97,26 @@ public class SpreadItController {
 	
     @RequestMapping(value="/send", method=RequestMethod.POST)
     @ResponseBody
-    public String send(@RequestParam("server_id") int server_id, @RequestParam("msg") String msg) {
+    public String send(@RequestParam("server_id") final int server_id, @RequestParam("msg") final String msg) {
         String gcm_id;
         try {
             gcm_id = SqlHandler.get_gcm_id(server_id);
         }
         catch (TtlSqlException e) {
             out.println("/users : "+e.getMessage()+" for server_id="+server_id);
-            return e.getMessage()+" for server_id="+server_id;
+            return e.getMessage();
         }
 
         try {
             sendMsgToGcm(SqlHandler.retrieve_users(server_id, Application.rayon_diffusion_km), msg);
             out.println("/send : Successfully msg=\""+msg+"\" sent");
-            return "Successfully msg=\""+msg+"\" sent";
+            return "Successfully msg=\"" + msg + "\" sent";
         }
         catch (GcmException e) {
             out.println("Exception at SpreadItController.sendMsgToGcm static method :");
             out.println(e.getMessage());
             out.println("/send : Failure of the HTTP response from GCM servers");
-            return "Failure of the HTTP response to GCM servers";
+            return "Failure of the HTTP response from GCM servers";
         }
         catch (TtlSqlException e) {
             out.println("/send : "+e.getMessage()+" for server_id="+server_id);
@@ -133,7 +131,7 @@ public class SpreadItController {
     }
 
 
-    private static void sendMsgToGcm(Collection<User> users, String msg) throws Exception {
+    private static void sendMsgToGcm(final Collection<User> users, final String msg) throws Exception {
         if (users==null || users.isEmpty()) return;
 
         CloseableHttpClient client = null;
