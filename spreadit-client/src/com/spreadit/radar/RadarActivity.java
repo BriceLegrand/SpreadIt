@@ -18,8 +18,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -28,6 +30,7 @@ public class RadarActivity extends Activity
 	private SlidingUpPanelLayout mHistoryLayout;
 	private RelativeLayout mainContent;
 	private EditText mNewMsg;
+	private ListView mHistoryList;
 	private boolean displayMsg;
 
 	public static final String SAVED_STATE_ACTION_BAR_HIDDEN = "saved_state_action_bar_hidden";
@@ -45,6 +48,13 @@ public class RadarActivity extends Activity
 
 		mNewMsg = (EditText) findViewById(R.id.txtNewMsg);
 		mHistoryLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+		mHistoryList = (ListView) findViewById(R.id.historyList);
+		//mHistoryList.setAdapter(mHistoryListAdapter); TODO: create an adapter
+	    String[] values = new String[] { "#API12 So Fresh !", "Such concert #Amaze",
+	            "Alea Jacta #Est", "Avé #Cesar", "Android & SMA #API12" };
+	    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+	            android.R.layout.simple_list_item_1, values);
+		mHistoryList.setAdapter(adapter);
 
 		mNewMsg.setVisibility(View.GONE);
 		
@@ -104,6 +114,8 @@ public class RadarActivity extends Activity
 					mNewMsg.setVisibility(View.VISIBLE);
 					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[1]));
 					displayMsg = true;
+					
+					mHistoryLayout.hidePanel();
 				}
 				else
 				{
@@ -113,6 +125,8 @@ public class RadarActivity extends Activity
 					//at end of wave trigger change of button
 					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[0]));
 					displayMsg = false;
+					
+					mHistoryLayout.showPanel();
 				}
 			}
 		});

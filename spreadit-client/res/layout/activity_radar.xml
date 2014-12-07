@@ -58,32 +58,32 @@
 
         <!-- SLIDING LAYOUT -->
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/dragView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#eeeeee"
             android:clickable="true"
             android:focusable="false"
-            android:orientation="vertical" >
-
-           <LinearLayout
+            android:orientation="vertical">
+            
+            <ListView 
+                android:id="@+id/historyList"
                 android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize"
-                android:orientation="horizontal">
+        		android:layout_height="wrap_content"
+        		android:layout_below="@+id/historyTxt">    
+            </ListView>
 
-                <TextView
-                    android:id="@+id/historyTxt"
-                    android:layout_width="match_parent"
-                    android:text="@string/historyStr"
-                    android:layout_height="match_parent"      
-                    android:textSize="37sp"
-                    android:background="#e96d1f"
-                    android:gravity="center"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
+            <TextView
+                android:id="@+id/historyTxt"
+                android:layout_width="match_parent"
+                android:text="@string/historyStr"
+                android:layout_height="?android:attr/actionBarSize"      
+                android:textSize="37sp"
+                android:background="#e96d1f"
+                android:gravity="center"/>     
+                   
+        </RelativeLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </RelativeLayout>
