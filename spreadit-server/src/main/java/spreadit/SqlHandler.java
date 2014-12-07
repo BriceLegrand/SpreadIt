@@ -23,9 +23,16 @@ public class SqlHandler {
 	static {
 		dataSource = new DriverManagerDataSource();
 	    dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-	    dataSource.setUrl("jdbc:mysql://localhost:3306/spreadit");
+		
+		// local DB
+	    //dataSource.setUrl("jdbc:mysql://localhost:3306/spreadit");
+		
+		// Google Cloud Platform
+	    dataSource.setUrl("jdbc:mysql://173.194.111.52:3306/spreadit");
+
 	    dataSource.setUsername("root");
 	    dataSource.setPassword("root");
+		
 	    jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
