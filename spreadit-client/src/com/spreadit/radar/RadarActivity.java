@@ -1,6 +1,9 @@
 package com.spreadit.radar;
 
 
+import java.util.Random;
+import java.util.Vector;
+
 import com.nineoldandroids.view.animation.AnimatorProxy;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
@@ -18,72 +21,54 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class RadarActivity extends Activity 
 {
-	private SlidingUpPanelLayout mHistoryLayout;
-	private RelativeLayout mainContent;
-	private EditText mNewMsg;
-	private ListView mHistoryList;
-	private boolean displayMsg;
-
-	public static final String SAVED_STATE_ACTION_BAR_HIDDEN = "saved_state_action_bar_hidden";
-	private static final String ACTION_BAR_TITLE_FONT = "fonts/intriquescript.ttf";
-	private static final float ACTION_BAR_TITLE_SIZE = 37.0f;
+	private SlidingUpPanelLayout 	mHistoryLayout;
 	
-	private static final int[] btnCenterBg = { R.drawable.button_add_msg, R.drawable.button_send_msg };
+	private RelativeLayout 			mainContent;
+	
+	private EditText 				mNewMsg;
+	
+	private ListView 				mHistoryList;
+	
+	private boolean 				bDisplayMsg;
+	
+	private Vector<Button>			mCloseUsers;
+
+	
+	public 	static final String SAVED_STATE_ACTION_BAR_HIDDEN 	= "saved_state_action_bar_hidden";
+	private static final String ACTION_BAR_TITLE_FONT 			= "fonts/intriquescript.ttf";
+	private static final float 	ACTION_BAR_TITLE_SIZE 			= 37.0f;
+	private static final int	NB_CLOSE_USERS					= 5;
+	private static final int	CLOSE_USER_DIM					= 40; //dp
+	
+	private static final int[] btnCenterBg = { R.drawable.btn_add_msg, R.drawable.btn_send_msg };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-		buildActionBar();
 		setContentView(R.layout.activity_radar);
-
+		
+		mainContent = (RelativeLayout) findViewById(R.id.mainContent);
+		
+		buildActionBar();
+		buildHistory();
+		buildCloseUsers();
+		
 		mNewMsg = (EditText) findViewById(R.id.txtNewMsg);
-		mHistoryLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-		mHistoryList = (ListView) findViewById(R.id.historyList);
-		//mHistoryList.setAdapter(mHistoryListAdapter); TODO: create an adapter
-	    String[] values = new String[] { "#API12 So Fresh !", "Such concert #Amaze",
-	            "Alea Jacta #Est", "Avé #Cesar", "Android & SMA #API12" };
-	    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-	            android.R.layout.simple_list_item_1, values);
-		mHistoryList.setAdapter(adapter);
-
 		mNewMsg.setVisibility(View.GONE);
 		
-		displayMsg = false;
-
-		mHistoryLayout.setPanelSlideListener(new PanelSlideListener() 
-		{
-			@Override
-			public void onPanelSlide(View panel, float slideOffset) 
-			{
-				setActionBarTranslation(mHistoryLayout.getCurrentParalaxOffset());
-			}
-
-			@Override
-			public void onPanelExpanded(View panel) 
-			{}
-
-			@Override
-			public void onPanelCollapsed(View panel) 
-			{}
-
-			@Override
-			public void onPanelAnchored(View panel) 
-			{}
-
-			@Override
-			public void onPanelHidden(View panel) 
-			{}
-		});
+		bDisplayMsg = false;
 
 		boolean actionBarHidden = savedInstanceState != null && savedInstanceState.getBoolean(SAVED_STATE_ACTION_BAR_HIDDEN, false);
 		if (actionBarHidden) 
@@ -109,22 +94,27 @@ public class RadarActivity extends Activity
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-ge	nerated method stub
-				if( !displayMsg )
+				if( !bDisplayMsg )
 				{
 					mNewMsg.setVisibility(View.VISIBLE);
 					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[1]));
-					displayMsg = true;
+					bDisplayMsg = true;
 					
 					mHistoryLayout.hidePanel();
 				}
 				else
 				{
+					if( mNewMsg.getText().toString().equals("") )
+					{
+						Toast emptyMsg = Toast.makeText(getBaseContext(), "Le message est vide.", Toast.LENGTH_SHORT);
+						emptyMsg.show();
+					}
 					//send the message
 					mNewMsg.setVisibility(View.GONE);
 					//start the wave
 					//at end of wave trigger change of button
 					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[0]));
-					displayMsg = false;
+					bDisplayMsg = false;
 					
 					mHistoryLayout.showPanel();
 				}
@@ -143,6 +133,74 @@ public class RadarActivity extends Activity
 		abTitle.setPadding(180, 0, 0, 0);
 		Typeface tF = Typeface.createFromAsset(getAssets(), ACTION_BAR_TITLE_FONT);
 		abTitle.setTypeface(tF);
+	}
+
+	
+	private void buildHistory()
+	{
+		mHistoryLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+		mHistoryList = (ListView) findViewById(R.id.historyList);
+		//mHistoryList.setAdapter(mHistoryListAdapter); TODO: create an adapter
+	    String[] values = new String[] { "#API12 So Fresh !", "Such concert #Amaze",
+	            "Alea Jacta #Est", "Avé #Cesar", "Android & SMA #API12" };
+	    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, values);
+		mHistoryList.setAdapter(adapter);
+		
+		mHistoryLayout.setPanelSlideListener(new PanelSlideListener() 
+		{
+			@Override
+			public void onPanelSlide(View panel, float slideOffset) 
+			{
+				setActionBarTranslation(mHistoryLayout.getCurrentParalaxOffset());
+			}
+
+			@Override
+			public void onPanelExpanded(View panel) 
+			{}
+
+			@Override
+			public void onPanelCollapsed(View panel) 
+			{}
+
+			@Override
+			public void onPanelAnchored(View panel) 
+			{}
+
+			@Override
+			public void onPanelHidden(View panel) 
+			{}
+		});
+	}
+	
+	private void buildCloseUsers() 
+	{
+		mCloseUsers = new Vector<Button>();
+		int i;
+		for(i = 0; i < NB_CLOSE_USERS; ++i)
+		{
+			Button user = new Button(getBaseContext());
+			user.setBackground(getResources().getDrawable(R.drawable.btn_close_user));
+			user.setLayoutParams(new LayoutParams(CLOSE_USER_DIM, CLOSE_USER_DIM));
+			
+			Random fate = new Random();
+			user.setX(fate.nextInt(720));
+			user.setY(fate.nextInt(1280));
+			
+			final int nb = i;
+			user.setOnClickListener(new OnClickListener()
+			{
+				
+				@Override
+				public void onClick(View v)
+				{
+					Toast whoIam = Toast.makeText(getBaseContext(), "I am user " + nb, Toast.LENGTH_SHORT);
+					whoIam.show();
+				}
+			});
+			
+			mainContent.addView(user);
+			mCloseUsers.add(user);
+		}
 	}
 
 	@Override
@@ -222,7 +280,8 @@ public class RadarActivity extends Activity
 		// A hack to add the translation to the action bar
 		ViewGroup content = ((ViewGroup) findViewById(android.R.id.content).getParent());
 		int children = content.getChildCount();
-		for (int i = 0; i < children; i++) 
+		int i;
+		for (i = 0; i < children; ++i) 
 		{
 			View child = content.getChildAt(i);
 			if (child.getId() != android.R.id.content) 
