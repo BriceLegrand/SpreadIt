@@ -34,9 +34,9 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:adjustViewBounds="true"
-                android:background="@drawable/button_add_msg"
+                android:background="@drawable/btn_add_msg"
                 android:scaleType="fitXY"
-                android:src="@drawable/button_add_msg"/>
+                android:src="@drawable/btn_add_msg"/>
 
             <EditText
                 android:id="@+id/txtNewMsg"
