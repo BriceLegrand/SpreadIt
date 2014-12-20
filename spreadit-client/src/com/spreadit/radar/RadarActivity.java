@@ -12,7 +12,6 @@ import com.spreadit.R;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -45,11 +44,14 @@ public class RadarActivity extends Activity
 	private Vector<Button>			mCloseUsers;
 
 	
-	public 	static final String SAVED_STATE_ACTION_BAR_HIDDEN 	= "saved_state_action_bar_hidden";
-	private static final String ACTION_BAR_TITLE_FONT 			= "fonts/intriquescript.ttf";
-	private static final float 	ACTION_BAR_TITLE_SIZE 			= 37.0f;
-	private static final int	NB_CLOSE_USERS					= 5;
-	private static final int	CLOSE_USER_DIM					= 40; //dp
+	public 	static final String 	SAVED_STATE_ACTION_BAR_HIDDEN 	= "saved_state_action_bar_hidden";
+	private static final String 	ACTION_BAR_TITLE_FONT 			= "fonts/intriquescript.ttf";
+	private static final float 		ACTION_BAR_TITLE_SIZE 			= 37.0f;
+	private static final float 		SCREEN_X_MAX 					= 1050.0f;
+	private static final float		SCREEN_Y_MAX					= 1280.0f;
+	private static final int		NB_CLOSE_USERS					= 5;
+	private static final int		CLOSE_USER_DIM					= 40;  //dp
+	private static final int		ONE_LINE_LENGTH_MAX				= 50; //chars
 	
 	private static final int[] btnCenterBg = { R.drawable.btn_add_msg, R.drawable.btn_send_msg };
 
@@ -183,9 +185,17 @@ public class RadarActivity extends Activity
 			user.setLayoutParams(new LayoutParams(CLOSE_USER_DIM, CLOSE_USER_DIM));
 			
 			Random fate = new Random();
-			user.setX(fate.nextInt(720));
-			user.setY(fate.nextInt(1280));
-			
+			user.setX(fate.nextInt(Math.round(SCREEN_X_MAX)));
+			user.setY(fate.nextInt(Math.round(SCREEN_Y_MAX)));
+			final float MIDDLE_SCREEN_X = SCREEN_X_MAX / 2.0f;
+			while( (user.getX() > (MIDDLE_SCREEN_X - 100.0f) && user.getX() < (MIDDLE_SCREEN_X + 100.0f)) 
+					&& (user.getY() > 600.0f && user.getY() < 780.0f) )
+			{
+				user.setX(fate.nextInt(Math.round(SCREEN_X_MAX)));
+				user.setY(fate.nextInt(Math.round(SCREEN_Y_MAX)));
+			}
+			final float userX = user.getX();
+			final float userY = user.getY();
 			final int nb = i;
 			user.setOnClickListener(new OnClickListener()
 			{
@@ -193,8 +203,30 @@ public class RadarActivity extends Activity
 				@Override
 				public void onClick(View v)
 				{
-					Toast whoIam = Toast.makeText(getBaseContext(), "I am user " + nb, Toast.LENGTH_SHORT);
-					whoIam.show();
+					final TextView msgBox = (TextView) getLayoutInflater().inflate(R.layout.msg_box, null);
+					msgBox.setText("I am user " + nb);
+					// calculation of message position
+					msgBox.setY(userY + 10.0f);
+					if( userX > (MIDDLE_SCREEN_X - 20.0f ) )
+					{
+						float msgPonderation = Math.min(((float) msgBox.getText().length()) / ONE_LINE_LENGTH_MAX, 1.0f);
+						msgBox.setX(userX - 2.5f * msgPonderation * ((MIDDLE_SCREEN_X - 20.0f) - (SCREEN_X_MAX - userX)));
+					}
+					else
+					{
+						msgBox.setX(userX);
+					}
+					
+					msgBox.setOnClickListener(new OnClickListener() 
+					{
+						
+						@Override
+						public void onClick(View v) 
+						{
+							msgBox.setVisibility(View.GONE);
+						}
+					});
+					mainContent.addView(msgBox);
 				}
 			});
 			
