@@ -11,6 +11,7 @@ import com.spreadit.R;
 
 import android.app.Activity;
 import android.app.ActionBar;
+import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -91,6 +93,7 @@ public class RadarActivity extends Activity
 
 		mainContent = (RelativeLayout) findViewById(R.id.mainContent);
 		final Button btnNewMsg = (Button) findViewById(R.id.btnNewMsg);
+		final Activity current = this;
 		btnNewMsg.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -111,8 +114,18 @@ public class RadarActivity extends Activity
 						Toast emptyMsg = Toast.makeText(getBaseContext(), "Le message est vide.", Toast.LENGTH_SHORT);
 						emptyMsg.show();
 					}
-					//send the message
+					
+					mNewMsg.clearFocus();
 					mNewMsg.setVisibility(View.GONE);
+					// force keyboard closure
+					InputMethodManager imm = (InputMethodManager) current.getSystemService(Context.INPUT_METHOD_SERVICE);
+					if (imm.isAcceptingText())
+					{
+						imm.hideSoftInputFromWindow(mNewMsg.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+					}
+					//send the message
+					
+					mNewMsg.setText("");
 					//start the wave
 					//at end of wave trigger change of button
 					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[0]));
