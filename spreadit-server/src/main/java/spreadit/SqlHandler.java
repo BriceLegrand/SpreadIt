@@ -42,7 +42,7 @@ public class SqlHandler {
 		jdbcTemplate.execute("DROP TABLE IF EXISTS user");
 		jdbcTemplate.execute("CREATE TABLE user ("
 		    + "server_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,"
-		    + "gcm_id VARCHAR(100) NOT NULL UNIQUE,"
+		    + "gcm_id VARCHAR(255) NOT NULL UNIQUE,"
 		    + "latitude DOUBLE,"
 		    + "longitude DOUBLE,"
 		    + "last_use_time TIMESTAMP NOT NULL"
