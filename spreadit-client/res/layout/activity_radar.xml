@@ -6,21 +6,20 @@
     tools:context="com.example.spreadit.RadarActivity"
     tools:ignore="MergeRootFrame" >
 
-
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
+        sothree:dragView="@+id/dragView"
         sothree:panelHeight="?android:attr/actionBarSize"
-        sothree:shadowHeight="4dp"
         sothree:paralaxOffset="100dp"
-        sothree:dragView="@+id/dragView">
+        sothree:shadowHeight="4dp" >
 
         <!-- MAIN CONTENT -->
 
-       <RelativeLayout
+        <RelativeLayout
             android:id="@+id/mainContent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -36,7 +35,7 @@
                 android:adjustViewBounds="true"
                 android:background="@drawable/btn_add_msg"
                 android:scaleType="fitXY"
-                android:src="@drawable/btn_add_msg"/>
+                android:src="@drawable/btn_add_msg" />
 
             <EditText
                 android:id="@+id/txtNewMsg"
@@ -53,7 +52,6 @@
 
                 <requestFocus />
             </EditText>
-
         </RelativeLayout>
 
         <!-- SLIDING LAYOUT -->
@@ -65,24 +63,41 @@
             android:background="#eeeeee"
             android:clickable="true"
             android:focusable="false"
-            android:orientation="vertical">
-            
-            <ListView 
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/historyBar"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                android:orientation="horizontal"
+                android:background="#e96d1f">
+
+                <TextView
+                    android:id="@+id/historyTxt"
+                    android:layout_width="320dp"
+                    android:layout_height="?android:attr/actionBarSize"
+                    android:gravity="center"
+                    android:text="@string/historyStr"
+                    android:textColor="#000000"
+                    android:textSize="37sp" />
+
+                <Button
+                    android:id="@+id/historyFilter"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/filter"
+                    android:gravity="end"/>
+            </LinearLayout>
+
+            <ListView
                 android:id="@+id/historyList"
                 android:layout_width="match_parent"
-        		android:layout_height="wrap_content"
-        		android:layout_below="@+id/historyTxt">    
-            </ListView>
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/historyBar"  >
 
-            <TextView
-                android:id="@+id/historyTxt"
-                android:layout_width="match_parent"
-                android:text="@string/historyStr"
-                android:layout_height="?android:attr/actionBarSize"      
-                android:textSize="37sp"
-                android:background="#e96d1f"
-                android:gravity="center"/>     
-                   
+                <!-- android:layout_below="@+id/historyTxt" -->
+            </ListView>
         </RelativeLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
