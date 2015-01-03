@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -161,6 +162,13 @@ public class RadarActivity extends Activity
 	    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, values);
 		mHistoryList.setAdapter(adapter);
 		
+		final Button btnFilter = (Button) findViewById(R.id.historyFilter);
+		btnFilter.setVisibility(View.GONE);
+		
+		final TextView historyTxt = (TextView) findViewById(R.id.historyTxt);
+		final int PADDING_BAR = 128;
+		historyTxt.setPadding(PADDING_BAR, 0, 0, 0);
+		
 		mHistoryLayout.setPanelSlideListener(new PanelSlideListener() 
 		{
 			@Override
@@ -171,11 +179,26 @@ public class RadarActivity extends Activity
 
 			@Override
 			public void onPanelExpanded(View panel) 
-			{}
+			{
+				Drawable logo = getResources().getDrawable(R.drawable.logo);
+				final int DRAWABLE_BOUND = 128;
+				logo.setBounds(0, 0, DRAWABLE_BOUND, 96);
+				historyTxt.setCompoundDrawables(logo, null, null, null);
+				
+				final int PADDING_BAR_2 = 60;
+				historyTxt.setPadding(PADDING_BAR_2, 0, PADDING_BAR_2, 0);
+				
+				btnFilter.setVisibility(View.VISIBLE);
+			}
 
 			@Override
 			public void onPanelCollapsed(View panel) 
-			{}
+			{
+				historyTxt.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+				historyTxt.setPadding(PADDING_BAR, 0, 0, 0);
+				
+				btnFilter.setVisibility(View.GONE);
+			}
 
 			@Override
 			public void onPanelAnchored(View panel) 
@@ -183,7 +206,19 @@ public class RadarActivity extends Activity
 
 			@Override
 			public void onPanelHidden(View panel) 
-			{}
+			{
+				historyTxt.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+			}
+		});
+		
+		btnFilter.setOnClickListener(new OnClickListener() 
+		{
+			
+			@Override
+			public void onClick(View v) 
+			{
+				Toast.makeText(getApplicationContext(), "Filters on", Toast.LENGTH_SHORT).show();
+			}
 		});
 	}
 	
@@ -297,6 +332,11 @@ public class RadarActivity extends Activity
 					item.setTitle(R.string.action_hide);
 				}
 			}
+			return true;
+		}
+		case R.id.action_filter:
+		{
+			Toast.makeText(getApplicationContext(), "Filters on", Toast.LENGTH_SHORT).show();
 			return true;
 		}
 		case R.id.action_settings: 
