@@ -8,6 +8,8 @@ import com.nineoldandroids.view.animation.AnimatorProxy;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.spreadit.R;
+import com.spreadit.utils.ActionItem;
+import com.spreadit.utils.QuickAction;
 
 import android.app.Activity;
 import android.app.ActionBar;
@@ -242,8 +244,6 @@ public class RadarActivity extends Activity
 				user.setX(fate.nextInt(Math.round(SCREEN_X_MAX)));
 				user.setY(fate.nextInt(Math.round(SCREEN_Y_MAX)));
 			}
-			final float userX = user.getX();
-			final float userY = user.getY();
 			final int nb = i;
 			user.setOnClickListener(new OnClickListener()
 			{
@@ -251,30 +251,12 @@ public class RadarActivity extends Activity
 				@Override
 				public void onClick(View v)
 				{
-					final TextView msgBox = (TextView) getLayoutInflater().inflate(R.layout.msg_box, null);
-					msgBox.setText("I am user " + nb);
-					// calculation of message position
-					msgBox.setY(userY + 10.0f);
-					if( userX > (MIDDLE_SCREEN_X - 20.0f ) )
-					{
-						float msgPonderation = Math.min(((float) msgBox.getText().length()) / ONE_LINE_LENGTH_MAX, 1.0f);
-						msgBox.setX(userX - 2.5f * msgPonderation * ((MIDDLE_SCREEN_X - 20.0f) - (SCREEN_X_MAX - userX)));
-					}
-					else
-					{
-						msgBox.setX(userX);
-					}
-					
-					msgBox.setOnClickListener(new OnClickListener() 
-					{
-						
-						@Override
-						public void onClick(View v) 
-						{
-							msgBox.setVisibility(View.GONE);
-						}
-					});
-					mainContent.addView(msgBox);
+					ActionItem msg = new ActionItem(1, "I am user " + nb, null);
+					ActionItem spread = new ActionItem(2, "", getResources().getDrawable(R.drawable.spread_icon));
+					final QuickAction quickAction = new QuickAction(getBaseContext(), QuickAction.HORIZONTAL);
+					quickAction.addActionItem(msg);
+					quickAction.addActionItem(spread);
+					quickAction.show(v);
 				}
 			});
 			
