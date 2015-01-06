@@ -52,10 +52,10 @@ public class RadarActivity extends Activity
 	public 	static final String 	SAVED_STATE_ACTION_BAR_HIDDEN 	= "saved_state_action_bar_hidden";
 	private static final String 	ACTION_BAR_TITLE_FONT 			= "fonts/intriquescript.ttf";
 	private static final float 		ACTION_BAR_TITLE_SIZE 			= 37.0f;
-	private static final float 		SCREEN_X_MAX 					= 1050.0f;
-	private static final float		SCREEN_Y_MAX					= 1280.0f;
+	private static final float 		SCREEN_X_MAX 					= 1000.0f;
+	private static final float		SCREEN_Y_MAX					= 1220.0f;
 	private static final int		NB_CLOSE_USERS					= 5;
-	private static final int		CLOSE_USER_DIM					= 40;  //dp
+	private static final int		CLOSE_USER_DIM					= 100;  //dp
 	private static final int		ONE_LINE_LENGTH_MAX				= 50; //chars
 	
 	private static final int[] btnCenterBg = { R.drawable.btn_add_msg, R.drawable.btn_send_msg };
@@ -238,8 +238,8 @@ public class RadarActivity extends Activity
 			user.setX(fate.nextInt(Math.round(SCREEN_X_MAX)));
 			user.setY(fate.nextInt(Math.round(SCREEN_Y_MAX)));
 			final float MIDDLE_SCREEN_X = SCREEN_X_MAX / 2.0f;
-			while( (user.getX() > (MIDDLE_SCREEN_X - 100.0f) && user.getX() < (MIDDLE_SCREEN_X + 100.0f)) 
-					&& (user.getY() > 600.0f && user.getY() < 780.0f) )
+			while( (user.getX() > (MIDDLE_SCREEN_X - 120.0f) && user.getX() < (MIDDLE_SCREEN_X + 120.0f)) 
+					&& (user.getY() > 520.0f && user.getY() < 800.0f) )
 			{
 				user.setX(fate.nextInt(Math.round(SCREEN_X_MAX)));
 				user.setY(fate.nextInt(Math.round(SCREEN_Y_MAX)));
@@ -251,11 +251,11 @@ public class RadarActivity extends Activity
 				@Override
 				public void onClick(View v)
 				{
-					ActionItem msg = new ActionItem(1, "I am user " + nb, null);
-					ActionItem spread = new ActionItem(2, "", getResources().getDrawable(R.drawable.spread_icon));
-					final QuickAction quickAction = new QuickAction(getBaseContext(), QuickAction.HORIZONTAL);
+					ActionItem msg = new ActionItem(1, "I am user " + nb, getResources().getDrawable(R.drawable.spread_icon));
+					//ActionItem spread = new ActionItem(2, "", getResources().getDrawable(R.drawable.spread_icon));
+					final QuickAction quickAction = new QuickAction(getBaseContext(), QuickAction.VERTICAL);
 					quickAction.addActionItem(msg);
-					quickAction.addActionItem(spread);
+					//quickAction.addActionItem(spread);
 					quickAction.show(v);
 				}
 			});
