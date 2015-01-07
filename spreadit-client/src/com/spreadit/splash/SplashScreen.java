@@ -4,6 +4,7 @@ import com.spreadit.R;
 import com.spreadit.R.id;
 import com.spreadit.R.layout;
 import com.spreadit.R.menu;
+//import com.spreadit.network.ComManager;
 import com.spreadit.radar.RadarActivity;
 
 import android.app.Activity;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 
 public class SplashScreen extends Activity 
 {
+	//private ComManager mComManager = new ComManager();
     /** Duration of wait **/
     private final int SPLASH_DISPLAY_LENGTH = 1500;
     
@@ -22,15 +24,21 @@ public class SplashScreen extends Activity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash_screen);
+		
+		//mComManager.connectAndGetGcmId(this);
+		//mComManager.setMainAct(this);
 		/* New Handler to start the Menu-Activity 
          * and close this Splash-Screen after some seconds.*/
         new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {
                 /* Create an Intent that will start the Menu-Activity. */
-                Intent mainIntent = new Intent(SplashScreen.this, RadarActivity.class);
-                SplashScreen.this.startActivity(mainIntent);
-                SplashScreen.this.finish();
+		//if(mComManager.isLocationEnabled())
+		//{
+            Intent mainIntent = new Intent(SplashScreen.this, RadarActivity.class);
+            SplashScreen.this.startActivity(mainIntent);
+            SplashScreen.this.finish();
+		//}
             }
         }, SPLASH_DISPLAY_LENGTH);
 	}
