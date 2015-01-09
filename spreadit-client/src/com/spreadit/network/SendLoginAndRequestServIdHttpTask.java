@@ -2,8 +2,6 @@ package com.spreadit.network;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +17,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 class SendLoginAndRequestServIdHttpTask extends AsyncTask<String, String, String> {
 	/*

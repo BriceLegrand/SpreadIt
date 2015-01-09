@@ -2,8 +2,6 @@ package com.spreadit.network;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,8 +62,8 @@ class GetSurroundingUsersHttpTask extends AsyncTask<String, String, String> {
 	protected void onPostExecute(String result) {
 		super.onPostExecute(result);
 		// Do anything with response..
-		Log.d("tag", "Reset TTL message Sent");
-	    delegate.processSendMessageFinish();		
+		Log.d("tag", "Get surrounding users received");
+	    delegate.processGetSurroundingUsersFinish(result);		
 	}
 	
 

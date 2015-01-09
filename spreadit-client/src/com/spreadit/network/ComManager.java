@@ -3,7 +3,6 @@ package com.spreadit.network;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -25,12 +24,15 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.spreadit.R;
 import com.spreadit.radar.RadarActivity;
+import com.spreadit.splash.SplashScreen;
+import com.spreadit.splash.SplashScreen.AlarmReceiverUsers;
 
-public class ComManager implements AsyncResponse {
-	private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+public class ComManager implements AsyncResponse
+{
+	private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+	private static final String PROPERTY_APP_VERSION = "appVersion";
 	public static final String EXTRA_MESSAGE = "message";
 	public static final String PROPERTY_REG_ID = "registration_id";
-	private static final String PROPERTY_APP_VERSION = "appVersion";
 
 	SendLoginAndRequestServIdHttpTask gcmIdhttpTask;
 	SendMessageHttpTask sendMsgHttpTask;
@@ -38,31 +40,70 @@ public class ComManager implements AsyncResponse {
 	SendResetTTLHttpTask sendResetTTLHttpTask;
 	SendLogoutHttpTask sendLogoutHttpTask;
 	SendResetHttpTask sendResetHttpTask;
-	
-	private LocationsManager locManager = new LocationsManager();
+	GetSurroundingUsersHttpTask getSurroundUserHttpTask;
+
+	private LocationsManager locManager;
 
 
-	String SENDER_ID = "168328884942";
+	private String SENDER_ID;
 
 	static final String TAG = "GCMDemo";
 	private AlarmManager alarmMgr;
 	private PendingIntent alarmIntent;
 
-	
-	private String servUrl = "http://192.168.1.29:8080";
+	private AlarmManager mAlarmMgrUsers;
+	private PendingIntent mAlarmIntentUsers;
+
+	private String servUrl;
 
 	private List<String> users;
-	
+
 	private Context context;
 	private GoogleCloudMessaging gcm;
-	private AtomicInteger msgId = new AtomicInteger();
-	private SharedPreferences prefs;
+	//private AtomicInteger msgId;
+	//private SharedPreferences prefs;
 	private String regid;
 	private String serverId;
-	
+
 	private Activity mainAct; 
 
+	private boolean bIsLocationEnabled;
 
+	/** Constructeur privé */
+	private ComManager()
+	{
+		bIsLocationEnabled = false;
+		servUrl = "http://192.168.1.29:8080";
+		//msgId = new AtomicInteger();
+		locManager = new LocationsManager();
+		SENDER_ID = "168328884942";
+	}
+
+	private static class SingletonHolder
+	{
+		/** Instance unique non préinitialisée */
+		private static ComManager COM_MANAGER_INSTANCE = new ComManager();
+	}
+
+	/** Point d'accès pour l'instance unique du singleton */
+	public static ComManager getInstance()
+	{	
+		return SingletonHolder.COM_MANAGER_INSTANCE;
+	}
+
+	public void startUsersAlarmManager()
+	{
+		mAlarmMgrUsers = (AlarmManager) SpreadPOCV2.getAppContext()
+				.getSystemService(Context.ALARM_SERVICE);
+		long duration = 1000 * 60 * 5;
+		mAlarmMgrUsers.setInexactRepeating(
+				AlarmManager.ELAPSED_REALTIME_WAKEUP, duration,
+				duration, mAlarmIntentUsers);
+		Intent intent2 = new Intent(SpreadPOCV2.getAppContext(),
+				AlarmReceiverUsers.class);
+		mAlarmIntentUsers = PendingIntent.getBroadcast(
+				SpreadPOCV2.getAppContext(), 0, intent2, 0);
+	}
 
 
 	public void sendLogin(String gcm_id) {
@@ -70,19 +111,19 @@ public class ComManager implements AsyncResponse {
 		gcmIdhttpTask = new SendLoginAndRequestServIdHttpTask();
 		gcmIdhttpTask.delegate = this;
 		gcmIdhttpTask.execute(servUrl + "/login", gcm_id);
-		
+
 		//Launch alarmManager to send /reset_ttl every X minutes 
 		alarmMgr = (AlarmManager)SpreadPOCV2.getAppContext().getSystemService(Context.ALARM_SERVICE);
 		long duration = 1000*60*5;
 		alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-		      duration,
-		        duration, alarmIntent);
-		
+				duration,
+				duration, alarmIntent);
+
 		//setting app context attribute
 		context = SpreadPOCV2.getAppContext();
-		
+
 		Intent intent = 
-				new Intent(context, AlarmReceiver.class);
+				new Intent(context, AlarmReceiverTTL.class);
 		alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 	}
 
@@ -99,21 +140,28 @@ public class ComManager implements AsyncResponse {
 		sendLocationHttpTask.execute(servUrl + "/position",
 				serverId, latitude.toString(), longitude.toString());
 	}
-	
+
+	public void getSurroundingUsers() {
+		getSurroundUserHttpTask = new GetSurroundingUsersHttpTask();
+		getSurroundUserHttpTask.delegate = this;
+		getSurroundUserHttpTask.execute(servUrl + "/users",
+				serverId);
+	}
+
 	public void sentResetTTL() {
 		sendResetTTLHttpTask = new SendResetTTLHttpTask();
 		sendResetTTLHttpTask.delegate = this;
 		sendResetTTLHttpTask.execute(servUrl + "/reset_ttl",
 				serverId);
 	}
-	
+
 	public void sendLogout() {
 		sendLogoutHttpTask = new SendLogoutHttpTask();
 		sendLogoutHttpTask.delegate = this;
 		sendLogoutHttpTask.execute(servUrl + "/logout",
 				serverId);
 	}
-	
+
 	public void sendResetDatabase() {
 		sendResetHttpTask = new SendResetHttpTask();
 		sendResetHttpTask.delegate = this;
@@ -126,7 +174,7 @@ public class ComManager implements AsyncResponse {
 		// onPostExecute(result) method of RequestServerIdHttpTask.
 		Log.d("tag", "http result from process Finish " + serverId);
 		this.setServer_id(serverId);
-		
+
 
 		// We send location during connection after having verified that
 		// location services are activated
@@ -144,9 +192,14 @@ public class ComManager implements AsyncResponse {
 
 	@Override
 	public void processSendLocationFinish() {
-		// TODO Auto-generated method stub
 		Log.d("tag", "Location successfully sent");
-
+		if(locManager.isSplashOn())
+		{
+			Intent mainIntent = new Intent(this.getMainAct(), SplashScreen.class);
+			mainIntent.putExtra("LocReady", "DONE");
+			mainIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+			SpreadPOCV2.getAppContext().startActivity(mainIntent);
+		}
 
 	}
 
@@ -295,14 +348,13 @@ public class ComManager implements AsyncResponse {
 	/*
 	 * Inner class receiving the alarmIntent responsible of /reset_ttl
 	 */
-	public class AlarmReceiver extends BroadcastReceiver{
-
-	    	@Override
-	    	public void onReceive(Context context, Intent intent) {
-	    		// TODO Auto-generated method stub
-	    		ComManager.this.sentResetTTL();  		
-	    	}
-	    }
+	public class AlarmReceiverTTL extends BroadcastReceiver
+	{
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			ComManager.this.sentResetTTL();  		
+		}
+	}
 
 	/**
 	 * Registers the application with GCM servers asynchronously.
@@ -354,7 +406,7 @@ public class ComManager implements AsyncResponse {
 	public void setRegid(String regid) {
 		this.regid = regid;
 	}
-	
+
 	public List<String> getUsers() {
 		return users;
 	}
@@ -363,11 +415,19 @@ public class ComManager implements AsyncResponse {
 		this.users = users;
 	}
 
+	public boolean isLocationEnabled() {
+		return bIsLocationEnabled;
+	}
+
+	public void setIsLocationEnabled(boolean bIsLocationEnabled) {
+		this.bIsLocationEnabled = bIsLocationEnabled;
+	}
+
 	@Override
 	public void processSendResetTTLFinish() {
 		Log.d("tag","Reset ttl sent");
 	}
-	
+
 	@Override
 	public void processSendLogoutFinish() {
 		// TODO Auto-generated method stub
@@ -375,17 +435,25 @@ public class ComManager implements AsyncResponse {
 		locManager.stopLocationTracking();
 
 	}
-	
-    public void processGetSurroundingUsersFinish(String response) {
+
+	public void processGetSurroundingUsersFinish(String response) {
 		users = Arrays.asList(response.split(","));
-    }
+		if(response != null && response.equals("Time to live expired or user not logged in"))
+		{	// on est plus sensé envoyer des intent au splashscreen
+			locManager.setIsSplashOn(false);
+			// fin : lancement de Radar activity
+			Intent mainIntent = new Intent(this.getMainAct(), RadarActivity.class);
+			this.getMainAct().startActivity(mainIntent);
+			this.getMainAct().finish();
+		}
+	}
 
 	@Override
 	public void processSendResetDatabaseFinish() {
 		// TODO Auto-generated method stub
 		Log.d("tag", "reset database done");
 	}
-    
+
 	public Activity getMainAct() {
 		return mainAct;
 	}
@@ -394,15 +462,15 @@ public class ComManager implements AsyncResponse {
 		this.mainAct = mainAct;
 		locManager.setMainAct(mainAct);
 	}
-	
+
 	public boolean checkAndAskForLocationTrackingEnabled() {
-		
-		boolean locationEnabled = false;
+
+		bIsLocationEnabled = false;
 		LocationManager manager = (LocationManager) this.getMainAct()
 				.getSystemService(Context.LOCATION_SERVICE);
 		if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 				&& !manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-			locationEnabled = false;
+			bIsLocationEnabled = false;
 			Log.d("tag", "location still unavailable");
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this.getMainAct());
@@ -410,36 +478,32 @@ public class ComManager implements AsyncResponse {
 					"This application needs location tracking, do you want to open Android System location services ?")
 					.setPositiveButton(R.string.fire,
 							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									Intent gpsOptionsIntent = new Intent(
-											android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-									gpsOptionsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-									context.startActivity(gpsOptionsIntent);
-								}
-							})
+						public void onClick(DialogInterface dialog,
+								int id) {
+							Intent gpsOptionsIntent = new Intent(
+									android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+							gpsOptionsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							context.startActivity(gpsOptionsIntent);
+						}
+					})
 					.setNegativeButton(R.string.cancel,
 							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									ComManager.this.getMainAct().finish();
-								}
-							});
+						public void onClick(DialogInterface dialog,
+								int id) {
+							ComManager.this.getMainAct().finish();
+						}
+					});
 
 			AlertDialog alertDialog = builder.create();
 			Log.d("tag", "alertbuilder created");
 			alertDialog.show();
 		}
 
-		locationEnabled = true;
+		bIsLocationEnabled = true;
 
-		return locationEnabled;
+		return bIsLocationEnabled;
 
 	}
 
-   
-
-	
-	
 
 }
