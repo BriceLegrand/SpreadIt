@@ -58,14 +58,14 @@ public class ComManager implements AsyncResponse
 
 	private List<String> users;
 
-	private Context context;
+	private static Context mContext;
 	private GoogleCloudMessaging gcm;
 	//private AtomicInteger msgId;
 	//private SharedPreferences prefs;
 	private String regid;
 	private String serverId;
 
-	private Activity mainAct; 
+	private Activity mainAct;
 
 	private boolean bIsLocationEnabled;
 
@@ -75,7 +75,8 @@ public class ComManager implements AsyncResponse
 		bIsLocationEnabled = false;
 		servUrl = "http://192.168.1.29:8080";
 		//msgId = new AtomicInteger();
-		locManager = new LocationsManager();
+		mContext = SplashScreen.AppContext;
+		locManager = new LocationsManager(mContext);
 		SENDER_ID = "168328884942";
 	}
 
@@ -93,16 +94,16 @@ public class ComManager implements AsyncResponse
 
 	public void startUsersAlarmManager()
 	{
-		mAlarmMgrUsers = (AlarmManager) SpreadPOCV2.getAppContext()
+		mAlarmMgrUsers = (AlarmManager) mContext
 				.getSystemService(Context.ALARM_SERVICE);
 		long duration = 1000 * 60 * 5;
 		mAlarmMgrUsers.setInexactRepeating(
 				AlarmManager.ELAPSED_REALTIME_WAKEUP, duration,
 				duration, mAlarmIntentUsers);
-		Intent intent2 = new Intent(SpreadPOCV2.getAppContext(),
+		Intent intent2 = new Intent(mContext,
 				AlarmReceiverUsers.class);
 		mAlarmIntentUsers = PendingIntent.getBroadcast(
-				SpreadPOCV2.getAppContext(), 0, intent2, 0);
+				mContext, 0, intent2, 0);
 	}
 
 
@@ -113,18 +114,15 @@ public class ComManager implements AsyncResponse
 		gcmIdhttpTask.execute(servUrl + "/login", gcm_id);
 
 		//Launch alarmManager to send /reset_ttl every X minutes 
-		alarmMgr = (AlarmManager)SpreadPOCV2.getAppContext().getSystemService(Context.ALARM_SERVICE);
+		alarmMgr = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 		long duration = 1000*60*5;
 		alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
 				duration,
 				duration, alarmIntent);
 
-		//setting app context attribute
-		context = SpreadPOCV2.getAppContext();
-
 		Intent intent = 
-				new Intent(context, AlarmReceiverTTL.class);
-		alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+				new Intent(mContext, AlarmReceiverTTL.class);
+		alarmIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
 	}
 
 	public void sendMessage(String message) {
@@ -198,7 +196,7 @@ public class ComManager implements AsyncResponse
 			Intent mainIntent = new Intent(this.getMainAct(), SplashScreen.class);
 			mainIntent.putExtra("LocReady", "DONE");
 			mainIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-			SpreadPOCV2.getAppContext().startActivity(mainIntent);
+			mContext.startActivity(mainIntent);
 		}
 
 	}
@@ -211,8 +209,8 @@ public class ComManager implements AsyncResponse
 		if (checkPlayServices(act)) {
 			// If this check succeeds, proceed with normal processing.
 			// Otherwise, prompt user to get valid Play Services APK.
-			gcm = GoogleCloudMessaging.getInstance(SpreadPOCV2.getAppContext());
-			regid = getRegistrationId(context);
+			gcm = GoogleCloudMessaging.getInstance(mContext);
+			regid = getRegistrationId(mContext);
 
 			if (regid.isEmpty()) {
 				Log.d(TAG, "is empty");
@@ -233,7 +231,7 @@ public class ComManager implements AsyncResponse
 	 */
 	public boolean checkPlayServices(Activity act) {
 		int resultCode = GooglePlayServicesUtil
-				.isGooglePlayServicesAvailable(SpreadPOCV2.getAppContext());
+				.isGooglePlayServicesAvailable(act.getApplicationContext());
 		if (resultCode != ConnectionResult.SUCCESS) {
 			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
 				GooglePlayServicesUtil.getErrorDialog(resultCode, act,
@@ -256,7 +254,7 @@ public class ComManager implements AsyncResponse
 	 *         registration ID.
 	 */
 	private String getRegistrationId(Context context) {
-		final SharedPreferences prefs = getGCMPreferences(context);
+		final SharedPreferences prefs = getGCMPreferences(mContext);
 		String registrationId = prefs.getString(PROPERTY_REG_ID, "");
 		if (registrationId.isEmpty()) {
 			Log.i(TAG, "Registration not found.");
@@ -282,7 +280,7 @@ public class ComManager implements AsyncResponse
 		// This sample app persists the registration ID in shared preferences,
 		// but
 		// how you store the regID in your app is up to you.
-		return SpreadPOCV2.getAppContext().getSharedPreferences(
+		return mContext.getSharedPreferences(
 				RadarActivity.class.getSimpleName(), Context.MODE_PRIVATE);
 	}
 
@@ -291,11 +289,8 @@ public class ComManager implements AsyncResponse
 	 */
 	private static int getAppVersion(Context context) {
 		try {
-			PackageInfo packageInfo = SpreadPOCV2
-					.getAppContext()
-					.getPackageManager()
-					.getPackageInfo(
-							SpreadPOCV2.getAppContext().getPackageName(), 0);
+			PackageInfo packageInfo = mContext.getPackageManager()
+					.getPackageInfo(mContext.getPackageName(), 0);
 			return packageInfo.versionCode;
 		} catch (NameNotFoundException e) {
 			// should never happen
@@ -312,7 +307,7 @@ public class ComManager implements AsyncResponse
 			String msg = "";
 			try {
 				if (gcm == null) {
-					gcm = GoogleCloudMessaging.getInstance(context);
+					gcm = GoogleCloudMessaging.getInstance(mContext);
 				}
 				regid = gcm.register(SENDER_ID);
 				msg = "Device registered, registration ID=" + regid;
@@ -329,7 +324,7 @@ public class ComManager implements AsyncResponse
 				// message using the 'from' address in the message.
 
 				// Persist the regID - no need to register again.
-				storeRegistrationId(context, regid);
+				storeRegistrationId(mContext, regid);
 			} catch (IOException ex) {
 				msg = "Error :" + ex.getMessage();
 				// If there is an error, don't just keep trying to register.
@@ -483,7 +478,7 @@ public class ComManager implements AsyncResponse
 							Intent gpsOptionsIntent = new Intent(
 									android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 							gpsOptionsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							context.startActivity(gpsOptionsIntent);
+							mContext.startActivity(gpsOptionsIntent);
 						}
 					})
 					.setNegativeButton(R.string.cancel,

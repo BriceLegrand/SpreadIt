@@ -15,6 +15,8 @@ import com.spreadit.network.ComManager;
 public class SplashScreen extends Activity
 {
 	private ComManager mComManager;
+	
+	public static Context AppContext;
 	/** Duration of wait **/
 	//private final int SPLASH_DISPLAY_LENGTH = 1500;
 
@@ -24,6 +26,8 @@ public class SplashScreen extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash_screen);
 
+		AppContext = getApplicationContext();
+		
 		mComManager = ComManager.getInstance();
 		mComManager.connectAndGetGcmId(this);
 		mComManager.setMainAct(this);

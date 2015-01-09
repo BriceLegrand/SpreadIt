@@ -1,6 +1,7 @@
 package com.spreadit.network;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
@@ -27,16 +28,18 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 
 	LocationClient mLocationClient;
 	LocationRequest mLocationRequest;
+	private Context mAppContext;
 	private Double latitude;
 	private Double longitude;
 
 	private boolean bIsSplashOn;
 
 
-	public LocationsManager()
+	public LocationsManager(Context appContext)
 	{
 		super();
-		this.mLocationClient = new LocationClient(SpreadPOCV2.getAppContext(),this, this);
+		this.mAppContext = appContext;
+		this.mLocationClient = new LocationClient(this.mAppContext, this, this);
 		this.mLocationRequest = new LocationRequest();
 		bIsSplashOn = true;
 	}
@@ -172,11 +175,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 		Intent intent2open;
 		if(bIsSplashOn)
 		{
-			intent2open = new Intent(SpreadPOCV2.getAppContext(), SplashScreen.class);
+			intent2open = new Intent(this.mAppContext, SplashScreen.class);
 		}
 		else
 		{
-			intent2open = new Intent(SpreadPOCV2.getAppContext(), RadarActivity.class);
+			intent2open = new Intent(this.mAppContext, RadarActivity.class);
 		}
 		intent2open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent2open.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -184,7 +187,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 		intent2open.putExtra("latitude", latitude.toString());
 		intent2open.putExtra("longitude", longitude.toString());
 
-		SpreadPOCV2.getAppContext().startActivity(intent2open);
+		this.mAppContext.startActivity(intent2open);
 	}
 
 }
