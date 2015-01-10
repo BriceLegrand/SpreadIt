@@ -73,7 +73,7 @@ public class ComManager implements AsyncResponse
 	private ComManager()
 	{
 		bIsLocationEnabled = false;
-		servUrl = "http://192.168.1.29:8080";
+		servUrl = "http://192.168.0.42:8080";
 		//msgId = new AtomicInteger();
 		mContext = SplashScreen.AppContext;
 		locManager = new LocationsManager(mContext);
@@ -196,6 +196,7 @@ public class ComManager implements AsyncResponse
 			Intent mainIntent = new Intent(this.getMainAct(), SplashScreen.class);
 			mainIntent.putExtra("LocReady", "DONE");
 			mainIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+			mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			mContext.startActivity(mainIntent);
 		}
 
@@ -431,15 +432,19 @@ public class ComManager implements AsyncResponse
 
 	}
 
-	public void processGetSurroundingUsersFinish(String response) {
-		users = Arrays.asList(response.split(","));
-		if(response != null && response.equals("Time to live expired or user not logged in"))
-		{	// on est plus sensé envoyer des intent au splashscreen
-			locManager.setIsSplashOn(false);
-			// fin : lancement de Radar activity
-			Intent mainIntent = new Intent(this.getMainAct(), RadarActivity.class);
-			this.getMainAct().startActivity(mainIntent);
-			this.getMainAct().finish();
+	public void processGetSurroundingUsersFinish(String response)
+	{
+		if(response != null)
+		{
+			users = Arrays.asList(response.split(","));
+			if(!response.equals("Time to live expired or user not logged in"))
+			{	// on est plus sensé envoyer des intent au splashscreen
+				locManager.setIsSplashOn(false);
+				// fin : lancement de Radar activity
+				Intent mainIntent = new Intent(this.getMainAct(), RadarActivity.class);
+				this.getMainAct().startActivity(mainIntent);
+				this.getMainAct().finish();
+			}
 		}
 	}
 
