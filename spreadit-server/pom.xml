@@ -5,7 +5,7 @@
 
 	<groupId>spreadit</groupId>
 	<artifactId>spreadit-server</artifactId>
-	<version>POC2-Cloud-SQL</version>
+	<version>Cloud-SQL-RC-1</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
