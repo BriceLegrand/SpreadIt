@@ -84,12 +84,15 @@ public class SpreadItController {
             return e.getMessage();
         }
 
+        //TODO add 
+        	// if(!users.isEmpty()) {
         StringBuilder usersBuilder = new StringBuilder();
         for (User user : users) {
             usersBuilder.append(user.getServer_id());
             usersBuilder.append(",");
         }
         usersBuilder.setLength(usersBuilder.length() - 1); // remove last comma
+        // }
 
         out.println("/users : success for server_id="+server_id);
         return usersBuilder.toString();
