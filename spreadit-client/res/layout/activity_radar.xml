@@ -25,13 +25,20 @@
             android:layout_height="match_parent"
             android:paddingTop="?android:attr/actionBarSize" >
 
+            <com.spreadit.radar.CanvasAnimationView
+                android:id="@+id/wave_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/radar" />
+
             <Button
                 android:id="@+id/btnNewMsg"
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="69dp"
                 android:layout_height="69dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
+				android:layout_centerHorizontal="true"
+        		android:layout_centerVertical="true"
                 android:adjustViewBounds="true"
                 android:background="@drawable/btn_add_msg"
                 android:scaleType="fitXY"
@@ -69,8 +76,8 @@
                 android:id="@+id/historyBar"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/actionBarSize"
-                android:orientation="horizontal"
-                android:background="#e96d1f">
+                android:background="#e96d1f"
+                android:orientation="horizontal" >
 
                 <TextView
                     android:id="@+id/historyTxt"
@@ -87,14 +94,14 @@
                     android:layout_height="24dp"
                     android:adjustViewBounds="true"
                     android:background="@drawable/filter"
-                    android:gravity="end"/>
+                    android:gravity="end" />
             </LinearLayout>
 
             <ListView
                 android:id="@+id/historyList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/historyBar"  >
+                android:layout_below="@+id/historyBar" >
 
                 <!-- android:layout_below="@+id/historyTxt" -->
             </ListView>
