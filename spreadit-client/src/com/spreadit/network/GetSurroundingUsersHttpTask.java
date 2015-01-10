@@ -24,18 +24,18 @@ class GetSurroundingUsersHttpTask extends AsyncTask<String, String, String> {
 	 * @see android.os.AsyncTask#doInBackground(Params[])
 	 */
 	public AsyncResponse delegate=null;
-	
+
 	@Override
-	protected String doInBackground(String... params) {
+	protected String doInBackground(String... params)
+	{
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpGet httpget = new HttpGet(params[0]);
 		HttpResponse response;
 
 		String responseString = null;
 		try {
-		
-		    List<NameValuePair> requestParams = new LinkedList<NameValuePair>();
-		    requestParams.add(new BasicNameValuePair("server_id", params[1]));
+			List<NameValuePair> requestParams = new LinkedList<NameValuePair>();
+			requestParams.add(new BasicNameValuePair("server_id", params[1]));
 
 			response = httpclient.execute(httpget);
 			StatusLine statusLine = response.getStatusLine();
@@ -51,7 +51,7 @@ class GetSurroundingUsersHttpTask extends AsyncTask<String, String, String> {
 			}
 		} catch (ClientProtocolException e) {
 			// TODO Handle problems..
-			
+
 		} catch (IOException e) {
 			// TODO Handle problems..
 		}
@@ -63,8 +63,8 @@ class GetSurroundingUsersHttpTask extends AsyncTask<String, String, String> {
 		super.onPostExecute(result);
 		// Do anything with response..
 		Log.d("tag", "Get surrounding users received");
-	    delegate.processGetSurroundingUsersFinish(result);		
+		delegate.processGetSurroundingUsersFinish(result);		
 	}
-	
+
 
 }
