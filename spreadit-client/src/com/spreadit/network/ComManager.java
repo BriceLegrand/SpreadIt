@@ -73,7 +73,7 @@ public class ComManager implements AsyncResponse
 	private ComManager()
 	{
 		bIsLocationEnabled = false;
-		servUrl = "http://192.168.0.42:8181";
+		servUrl = "http://192.168.0.42:8080";
 		//msgId = new AtomicInteger();
 		mContext = SplashScreen.AppContext;
 		locManager = new LocationsManager(mContext);
@@ -437,7 +437,7 @@ public class ComManager implements AsyncResponse
 		if(response != null)
 		{
 			users = Arrays.asList(response.split(","));
-			if(response.equals("Time to live expired or user not logged in"))
+			if(!response.equals("Time to live expired or user not logged in"))
 			{	// on est plus sensé envoyer des intent au splashscreen
 				locManager.setIsSplashOn(false);
 				// fin : lancement de Radar activity

@@ -2,6 +2,7 @@ package com.spreadit.network;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,7 +12,10 @@ import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -29,14 +33,15 @@ class GetSurroundingUsersHttpTask extends AsyncTask<String, String, String> {
 	protected String doInBackground(String... params)
 	{
 		HttpClient httpclient = new DefaultHttpClient();
-		HttpGet httpget = new HttpGet(params[0]);
+		HttpGet httpget = new HttpGet(params[0] + "?server_id=" + params[1]);
 		HttpResponse response;
 
 		String responseString = null;
 		try {
 			List<NameValuePair> requestParams = new LinkedList<NameValuePair>();
 			requestParams.add(new BasicNameValuePair("server_id", params[1]));
-
+			//httpget.getParams().setParameter("server_id", params[1]);
+			//httpget.setParams(URLEncodedUtils.format(requestParams, "utf-8"));
 			response = httpclient.execute(httpget);
 			StatusLine statusLine = response.getStatusLine();
 			if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
