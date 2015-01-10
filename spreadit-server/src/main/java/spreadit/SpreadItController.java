@@ -84,15 +84,14 @@ public class SpreadItController {
             return e.getMessage();
         }
 
-        //TODO add 
-        	// if(!users.isEmpty()) {
         StringBuilder usersBuilder = new StringBuilder();
-        for (User user : users) {
-            usersBuilder.append(user.getServer_id());
-            usersBuilder.append(",");
+        if(!users.isEmpty()) {
+            for (User user : users) {
+                usersBuilder.append(user.getServer_id());
+                usersBuilder.append(",");
+            }
+            usersBuilder.setLength(usersBuilder.length() - 1); // remove last comma
         }
-        usersBuilder.setLength(usersBuilder.length() - 1); // remove last comma
-        // }
 
         out.println("/users : success for server_id="+server_id);
         return usersBuilder.toString();
@@ -147,12 +146,14 @@ public class SpreadItController {
 
             StringBuilder jsonBuilder = new StringBuilder();
             jsonBuilder.append("{ \"registration_ids\" : [");
-            for (User user : users) {
-                jsonBuilder.append("\"");
-                jsonBuilder.append(user.getGcm_id());
-                jsonBuilder.append("\",");
+            if (!users.isEmpty()) {
+                for (User user : users) {
+                    jsonBuilder.append("\"");
+                    jsonBuilder.append(user.getGcm_id());
+                    jsonBuilder.append("\",");
+                }
+                jsonBuilder.setLength(jsonBuilder.length() - 1); // remove last comma
             }
-            jsonBuilder.setLength(jsonBuilder.length() - 1); // remove last comma
             jsonBuilder.append("], \"data\": { \"msg\": \"");
             jsonBuilder.append(msg);
             jsonBuilder.append("\" }, \"time_to_live\":300");
