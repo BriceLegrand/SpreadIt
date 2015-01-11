@@ -11,6 +11,7 @@
 # Generated files
 bin/
 gen/
+target/
 
 # Gradle files
 .gradle/
@@ -48,3 +49,9 @@ proguard/
 #Intellij idea files
 .idea/
 *.iml
+
+ECLIPSE BY ARTHUR :
+target
+.classpath
+.project
+.settings

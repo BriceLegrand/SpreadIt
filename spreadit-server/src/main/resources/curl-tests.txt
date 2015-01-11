@@ -1,9 +1,14 @@
 # Curl server tests
 # Download curl.exe at http://www.paehl.com/open_source/?CURL_7.39.0 (Download WITH SUPPORT SSL)
 
-.\curl.exe http://localhost:8080
-	--> return "SpreadIt server is working."
+Browser http://localhost:8080
 .\curl.exe -d "gcm_id=trucbidule" http://localhost:8080/login
-	--> return "1" (server_id integer)
-.\curl.exe -d "server_id=1&msg=coucou les loulous" http://localhost:8080/send
-	--> return "Successfully msg="coucou les loulous" sent
+.\curl.exe -d "server_id=1" http://localhost:8080/logout
+.\curl.exe -d "gcm_id=trucbidule" http://localhost:8080/login
+.\curl.exe -d "gcm_id=trucbidule2" http://localhost:8080/login
+.\curl.exe -d "server_id=2&latitude=49.4184365&longitude=2.8212913" http://localhost:8080/position
+.\curl.exe -d "server_id=3&latitude=49.4184365&longitude=2.8212913" http://localhost:8080/position
+Browser http://localhost:8080/users?server_id=3
+Browser http://localhost:8080/users?server_id=4
+.\curl.exe -d "server_id=4" http://localhost:8080/reset_ttl
+.\curl.exe -d "server_id=3&msg=coucou les loulous" http://localhost:8080/send
