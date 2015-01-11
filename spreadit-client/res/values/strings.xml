@@ -11,5 +11,8 @@
     <string name="title_activity_splash_screen">SplashScreen</string>
     <string name="title_activity_history">HistoryActivity</string>
     <string name="msgHint">Message SpreadIt</string>
+    
+    <string name="fire">Yes</string>
+    <string name="cancel">No, quit application.</string>
 
 </resources>
