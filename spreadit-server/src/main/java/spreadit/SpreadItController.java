@@ -110,7 +110,7 @@ public class SpreadItController {
         }
 
         try {
-            sendMsgToGcm(SqlHandler.retrieve_users(server_id, Application.rayon_diffusion_km), msg);
+            sendMsgToGcm(SqlHandler.retrieve_users(server_id, Application.rayon_diffusion_km), server_id+"|"+msg);
             out.println("/send : Successfully msg=\""+msg+"\" sent");
             return "Successfully msg=\"" + msg + "\" sent";
         }
