@@ -50,7 +50,7 @@ public class RadarActivity extends Activity
 
 	private boolean 				bDisplayMsg;
 
-	private Map<Button, String>		mCloseUsers;
+	private Map<String, Button>		mCloseUsers;
 
 	private ComManager				mComManager;
 
@@ -81,7 +81,7 @@ public class RadarActivity extends Activity
 		buildActionBar();
 		buildHistory();
 
-		mCloseUsers = new HashMap<Button, String>();
+		mCloseUsers = new HashMap<String, Button>();
 		buildCloseUsers();
 
 		mNewMsg = (EditText) findViewById(R.id.txtNewMsg);
@@ -139,7 +139,8 @@ public class RadarActivity extends Activity
 						imm.hideSoftInputFromWindow(mNewMsg.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 					}
 					//send the message
-
+					mComManager.sendMessage(mNewMsg.getText().toString());
+					
 					mNewMsg.setText("");
 					//start the wave
 					//at end of wave trigger change of button
@@ -257,19 +258,7 @@ public class RadarActivity extends Activity
 				user.setX(fate.nextInt(Math.round(SCREEN_X_MAX)));
 				user.setY(fate.nextInt(Math.round(SCREEN_Y_MAX)));
 			}
-			final int nb = i;
-			user.setOnClickListener(new OnClickListener()
-			{
 
-				@Override
-				public void onClick(View v)
-				{
-					ActionItem msg = new ActionItem(1, "I am user " + nb, getResources().getDrawable(R.drawable.spread_icon));
-					final QuickAction quickAction = new QuickAction(getBaseContext(), QuickAction.VERTICAL);
-					quickAction.addActionItem(msg);
-					quickAction.show(v);
-				}
-			});
 			View v = mainContent.findViewWithTag("userView" + i);
 			if(v != null)
 			{
@@ -277,7 +266,8 @@ public class RadarActivity extends Activity
 			}
 			user.setTag("userView" + i);
 			mainContent.addView(user);
-			mCloseUsers.put(user, mComManager.getUsers().get(i).toString());
+			//mCloseUsers.put(mComManager.getUsers().get(i).toString(), user);
+			mCloseUsers.put(Integer.toString(i), user);
 		}
 	}
 
@@ -399,22 +389,44 @@ public class RadarActivity extends Activity
 	protected void onNewIntent(Intent intent) {
 		Log.d("Radar", "onNewIntent is called!");
 
-		//currentMessage = intent.getStringExtra("msg");
 		String lat = intent.getStringExtra("latitude");
 		String lon = intent.getStringExtra("longitude");
 
-		// Case 1 : A message is received and displayed
-		//if (currentMessage != null) {
-		//currentMessage = intent.getStringExtra("msg");
-		//mDisplay.setText(currentMessage);
-		//}
+		//		 Case 1 : A message is received and displayed
+		final String currentMessage = intent.getStringExtra("msg");
+		if (currentMessage != null) 
+		{
+			//for(int i = 0; i < mCloseUsers.size(); ++i)
+			//{
+				Button user = mCloseUsers.get(Integer.toString(0));
+				user.setOnClickListener(new OnClickListener()
+				{
+					@Override
+					public void onClick(View v)
+					{
+						ActionItem msg = new ActionItem(1, currentMessage, getResources().getDrawable(R.drawable.spread_icon));
+						final QuickAction quickAction = new QuickAction(getBaseContext(), QuickAction.VERTICAL);
+						quickAction.addActionItem(msg);
+						quickAction.show(v);
+					}
+				});
+			//}
+		}
 		//		 Case 2 : A new location is received and sent to server
-		if (lat != null) {
+		if (lat != null)
+		{
 			mComManager.sendLocation(Double.valueOf(lat), Double.valueOf(lon));
 			Log.d("tag", "sent location. Latitude : " + lat + " longitude : " + lon + " for servid : " + mComManager.getServer_id());
 		}
 
 		super.onNewIntent(intent);
+	}
+	
+	@Override
+	public void onDestroy()
+	{
+		mComManager.sendLogout();
+		super.onDestroy();
 	}
 
 }

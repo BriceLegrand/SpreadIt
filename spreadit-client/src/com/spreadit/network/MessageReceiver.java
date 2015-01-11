@@ -7,13 +7,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-public class MessageReceiver extends BroadcastReceiver {
+public class MessageReceiver extends BroadcastReceiver
+{
 	/*
 	 * Allow the application to receive GCM push messages
 	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
 	 */
 	@Override
-	public void onReceive(Context context, Intent intent) {
+	public void onReceive(Context context, Intent intent)
+	{
 		// TODO Auto-generated method stub
 		String newMessage = intent.getExtras().getString("msg");
 		Log.d("tag","Message received from GCM " + newMessage);
