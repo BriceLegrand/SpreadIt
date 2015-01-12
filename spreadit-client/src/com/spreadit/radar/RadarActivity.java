@@ -71,6 +71,7 @@ public class RadarActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
+		Log.d("DEBUGTUTUR", "radar activity onCreate-heu");
 		setContentView(R.layout.activity_radar);
 
 		mComManager = ComManager.getInstance();
@@ -447,6 +448,7 @@ public class RadarActivity extends Activity
 	@Override
 	public void onDestroy()
 	{
+		Log.d("DEBUGTUTUR", "radar activity onDestroy");
 		mComManager.sendLogout();
 		super.onDestroy();
 	}
