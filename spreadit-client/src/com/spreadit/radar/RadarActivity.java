@@ -48,9 +48,11 @@ public class RadarActivity extends Activity
 
 	private ListView 				mHistoryList;
 
+	private ArrayAdapter<String>	mHistoryAdapter;
+
 	private boolean 				bDisplayMsg;
 
-	private Map<Button, String>		mCloseUsers;
+	private Map<String, Button>		mCloseUsers;
 
 	private ComManager				mComManager;
 
@@ -60,7 +62,7 @@ public class RadarActivity extends Activity
 	private static final float 		ACTION_BAR_TITLE_SIZE 			= 37.0f;
 	private static final float 		SCREEN_X_MAX 					= 1000.0f;
 	private static final float		SCREEN_Y_MAX					= 1220.0f;
-	private static final int		NB_CLOSE_USERS					= 5;
+	//private static final int		NB_CLOSE_USERS					= 5;
 	private static final int		CLOSE_USER_DIM					= 100;  //dp
 
 	private static final int[] btnCenterBg = { R.drawable.btn_add_msg, R.drawable.btn_send_msg };
@@ -81,7 +83,7 @@ public class RadarActivity extends Activity
 		buildActionBar();
 		buildHistory();
 
-		mCloseUsers = new HashMap<Button, String>();
+		mCloseUsers = new HashMap<String, Button>();
 		buildCloseUsers();
 
 		mNewMsg = (EditText) findViewById(R.id.txtNewMsg);
@@ -138,10 +140,13 @@ public class RadarActivity extends Activity
 					{
 						imm.hideSoftInputFromWindow(mNewMsg.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 					}
-					//send the message
-
-					mNewMsg.setText("");
-					//start the wave
+					if( !mNewMsg.getText().toString().equals("") )
+					{
+						//send the message
+						mComManager.sendMessage(mNewMsg.getText().toString());
+						mNewMsg.setText("");
+						//start the wave
+					}
 					//at end of wave trigger change of button
 					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[0]));
 					bDisplayMsg = false;
@@ -171,10 +176,10 @@ public class RadarActivity extends Activity
 		mHistoryLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 		mHistoryList = (ListView) findViewById(R.id.historyList);
 		//mHistoryList.setAdapter(mHistoryListAdapter); TODO: create an adapter
-		String[] values = new String[] { "#API12 So Fresh !", "Such concert #Amaze",
-				"Alea Jacta #Est", "Avé #Cesar", "Android & SMA #API12" };
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, values);
-		mHistoryList.setAdapter(adapter);
+		//String[] values = new String[] { "#API12 So Fresh !", "Such concert #Amaze",
+		//		"Alea Jacta #Est", "Avé #Cesar", "Android & SMA #API12" };
+		mHistoryAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+		mHistoryList.setAdapter(mHistoryAdapter);
 
 		final Button btnFilter = (Button) findViewById(R.id.historyFilter);
 		btnFilter.setVisibility(View.GONE);
@@ -257,19 +262,7 @@ public class RadarActivity extends Activity
 				user.setX(fate.nextInt(Math.round(SCREEN_X_MAX)));
 				user.setY(fate.nextInt(Math.round(SCREEN_Y_MAX)));
 			}
-			final int nb = i;
-			user.setOnClickListener(new OnClickListener()
-			{
 
-				@Override
-				public void onClick(View v)
-				{
-					ActionItem msg = new ActionItem(1, "I am user " + nb, getResources().getDrawable(R.drawable.spread_icon));
-					final QuickAction quickAction = new QuickAction(getBaseContext(), QuickAction.VERTICAL);
-					quickAction.addActionItem(msg);
-					quickAction.show(v);
-				}
-			});
 			View v = mainContent.findViewWithTag("userView" + i);
 			if(v != null)
 			{
@@ -277,7 +270,8 @@ public class RadarActivity extends Activity
 			}
 			user.setTag("userView" + i);
 			mainContent.addView(user);
-			mCloseUsers.put(user, mComManager.getUsers().get(i).toString());
+			mCloseUsers.put(mComManager.getUsers().get(i).toString(), user);
+			//mCloseUsers.put(Integer.toString(i), user);
 		}
 	}
 
@@ -396,25 +390,65 @@ public class RadarActivity extends Activity
 	 * )
 	 */
 	@Override
-	protected void onNewIntent(Intent intent) {
+	protected void onNewIntent(Intent intent)
+	{
 		Log.d("Radar", "onNewIntent is called!");
 
-		//currentMessage = intent.getStringExtra("msg");
 		String lat = intent.getStringExtra("latitude");
 		String lon = intent.getStringExtra("longitude");
 
-		// Case 1 : A message is received and displayed
-		//if (currentMessage != null) {
-		//currentMessage = intent.getStringExtra("msg");
-		//mDisplay.setText(currentMessage);
-		//}
+		//		 Case 1 : A message is received and displayed
+		final String currentMessage = intent.getStringExtra("msg");
+		final String currentServerId = intent.getStringExtra("server_id");
+		if (currentMessage != null && currentServerId != null) 
+		{
+			//Update history
+			if(mHistoryAdapter.getPosition(currentMessage) == -1)
+			{
+				mHistoryAdapter.add(currentMessage);
+			}
+			//Update close users messages
+			Button user = mCloseUsers.get(currentServerId);
+			if(user != null)
+			{
+				user.setOnClickListener(new OnClickListener()
+				{
+					@Override
+					public void onClick(View v)
+					{
+						ActionItem msg = new ActionItem(1, currentMessage, getResources().getDrawable(R.drawable.spread_icon));
+						final QuickAction quickAction = new QuickAction(getBaseContext(), QuickAction.VERTICAL);
+						quickAction.addActionItem(msg);
+						quickAction.setOnActionItemClickListener(new QuickAction.OnActionItemClickListener()
+						{
+							@Override
+							public void onItemClick(QuickAction source, int pos, int actionId)
+							{
+								mComManager.sendMessage(currentMessage); // THE SPREAD
+							}
+						});
+						quickAction.show(v);
+					}
+				});
+			}
+		}
+
 		//		 Case 2 : A new location is received and sent to server
-		if (lat != null) {
+		if (lat != null)
+		{
 			mComManager.sendLocation(Double.valueOf(lat), Double.valueOf(lon));
+			buildCloseUsers();
 			Log.d("tag", "sent location. Latitude : " + lat + " longitude : " + lon + " for servid : " + mComManager.getServer_id());
 		}
 
 		super.onNewIntent(intent);
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		mComManager.sendLogout();
+		super.onDestroy();
 	}
 
 }

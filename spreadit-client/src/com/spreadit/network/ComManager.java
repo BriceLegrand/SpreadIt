@@ -1,6 +1,7 @@
 package com.spreadit.network;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -73,6 +74,7 @@ public class ComManager implements AsyncResponse
 	private ComManager()
 	{
 		bIsLocationEnabled = false;
+		users = new ArrayList<String>();
 		servUrl = "http://192.168.0.42:8080";
 		//msgId = new AtomicInteger();
 		mContext = SplashScreen.AppContext;
@@ -436,7 +438,8 @@ public class ComManager implements AsyncResponse
 	{
 		if(response != null)
 		{
-			users = Arrays.asList(response.split(","));
+			if(!response.equals(""))
+				users = Arrays.asList(response.split(","));
 			if(!response.equals("Time to live expired or user not logged in"))
 			{	// on est plus sensé envoyer des intent au splashscreen
 				locManager.setIsSplashOn(false);
