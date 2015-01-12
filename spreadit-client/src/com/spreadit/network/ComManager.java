@@ -75,7 +75,8 @@ public class ComManager implements AsyncResponse
 	{
 		bIsLocationEnabled = false;
 		users = new ArrayList<String>();
-		servUrl = "http://192.168.0.42:8080";
+		//servUrl = "http://192.168.0.42:8080";
+		servUrl = "http://192.168.43.210:8080";
 		//msgId = new AtomicInteger();
 		mContext = SplashScreen.AppContext;
 		locManager = new LocationsManager(mContext);
@@ -96,16 +97,13 @@ public class ComManager implements AsyncResponse
 
 	public void startUsersAlarmManager()
 	{
-		mAlarmMgrUsers = (AlarmManager) mContext
-				.getSystemService(Context.ALARM_SERVICE);
+		mAlarmMgrUsers = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 		long duration = 1000 * 60 * 5;
 		mAlarmMgrUsers.setInexactRepeating(
 				AlarmManager.ELAPSED_REALTIME_WAKEUP, duration,
 				duration, mAlarmIntentUsers);
-		Intent intent2 = new Intent(mContext,
-				AlarmReceiverUsers.class);
-		mAlarmIntentUsers = PendingIntent.getBroadcast(
-				mContext, 0, intent2, 0);
+		Intent intent2 = new Intent(mContext, AlarmReceiverUsers.class);
+		mAlarmIntentUsers = PendingIntent.getBroadcast(mContext, 0, intent2, 0);
 	}
 
 
