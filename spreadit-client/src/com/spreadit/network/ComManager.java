@@ -26,7 +26,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.spreadit.R;
 import com.spreadit.radar.RadarActivity;
 import com.spreadit.splash.SplashScreen;
-import com.spreadit.splash.SplashScreen.AlarmReceiverUsers;
+import com.spreadit.radar.RadarActivity.AlarmReceiverUsers;
 
 public class ComManager implements AsyncResponse
 {
