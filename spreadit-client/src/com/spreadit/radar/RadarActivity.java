@@ -415,9 +415,10 @@ public class RadarActivity extends Activity
 		String lat = intent.getStringExtra("latitude");
 		String lon = intent.getStringExtra("longitude");
 
-		//		 Case 1 : A message is received and displayed
 		final String currentMessage = intent.getStringExtra("msg");
 		final String currentServerId = intent.getStringExtra("server_id");
+		
+		//		 Case 1 : A message is received and displayed
 		if (currentMessage != null && currentServerId != null) 
 		{
 			//Update history
@@ -450,9 +451,8 @@ public class RadarActivity extends Activity
 				});
 			}
 		}
-
 		//		 Case 2 : A new location is received and sent to server
-		if (lat != null)
+		else if (lat != null)
 		{
 			mComManager.sendLocation(Double.valueOf(lat), Double.valueOf(lon));
 			buildCloseUsers();

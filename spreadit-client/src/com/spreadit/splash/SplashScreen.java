@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.spreadit.R;
 import com.spreadit.network.ComManager;
@@ -15,9 +16,13 @@ public class SplashScreen extends Activity
 {
 	private ComManager mComManager;
 	
+	private ImageView mImgConnexion;
+
+	private ImageView mImgGeoloc;
+	
 	public static Context AppContext;
-	/** Duration of wait **/
-	//private final int SPLASH_DISPLAY_LENGTH = 1500;
+	
+	public static final int[] LOG_ICONS = { R.drawable.cross, R.drawable.valid };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -26,6 +31,9 @@ public class SplashScreen extends Activity
 		setContentView(R.layout.activity_splash_screen);
 
 		AppContext = getApplicationContext();
+		
+		mImgConnexion = (ImageView) findViewById(R.id.imgCnx);
+		mImgGeoloc = (ImageView) findViewById(R.id.imgGeo);
 		
 		mComManager = ComManager.getInstance();
 		mComManager.connectAndGetGcmId(this);
@@ -49,7 +57,7 @@ public class SplashScreen extends Activity
 		// }
 		// }, SPLASH_DISPLAY_LENGTH);
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
@@ -82,6 +90,7 @@ public class SplashScreen extends Activity
 		{
 			if (intent.getStringExtra("LocReady").equals("DONE"))
 			{
+				turnGeolocValid();
 				mComManager.getSurroundingUsers();
 			}
 			else
@@ -89,7 +98,6 @@ public class SplashScreen extends Activity
 				Log.d("tag", "New intent users not here.");
 			}
 		}
-
 		// Case 2 : A new location is received and sent to server
 		else if (intent.getStringExtra("latitude") != null)
 		{
@@ -99,6 +107,19 @@ public class SplashScreen extends Activity
 			Log.d("tag", "sent location. Latitude : " + lat + " longitude : "
 					+ lon + " for servid : " + mComManager.getServer_id());
 		}
-
+		else if(intent.getStringExtra("logConnexion") != null)
+		{
+			turnConnexionValid();
+		}
+	}
+	
+	public void turnConnexionValid()
+	{
+		mImgConnexion.setImageDrawable(getResources().getDrawable(LOG_ICONS[1]));
+	}
+	
+	public void turnGeolocValid()
+	{
+		mImgGeoloc.setImageDrawable(getResources().getDrawable(LOG_ICONS[1]));
 	}
 }
