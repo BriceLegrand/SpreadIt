@@ -17,7 +17,13 @@ public class SpreadItController {
     @RequestMapping("/")
     @ResponseBody
     public String index() {
-        SqlHandler.create_tables();
+        try {
+            SqlHandler.create_tables();
+        } catch (Exception e) {
+            out.println(e.getMessage());
+            out.println("/ : exception !");
+            return "/ : exception !";
+        }
         return "SpreadIt server is working.";
     }
 
@@ -25,17 +31,32 @@ public class SpreadItController {
 	@RequestMapping(value="/login", method=RequestMethod.POST)
     @ResponseBody
     public String login(@RequestParam("gcm_id") final String gcm_id) {
-		String server_id = Integer.toString(SqlHandler.login(gcm_id));
-        out.println("/login : saved gcm_id="+gcm_id+" with server_id="+server_id);
-        return server_id;
+        String result = "";
+        try {
+            result = Integer.toString(SqlHandler.login(gcm_id));
+            out.println("/login : saved gcm_id="+gcm_id+" with server_id="+result);
+        } catch (Exception e) {
+            result = "/login : exception for gcm_id="+gcm_id;
+            out.println(e.getMessage());
+            out.println(result);
+        }
+        return result;
     }
 	
 	@RequestMapping(value="/logout", method=RequestMethod.POST)
     @ResponseBody
     public String logout(@RequestParam("server_id") final int server_id) {
-		SqlHandler.logout(server_id);
-        out.println("/logout : server_id="+server_id+" logged out");
-        return "server_id="+server_id+" logged out";
+        String result = "";
+        try {
+            SqlHandler.logout(server_id);
+            result = "server_id="+server_id+" logged out";
+            out.println("/logout : "+result);
+        } catch (Exception e) {
+            result = "exception for server_id="+server_id;
+            out.println(e.getMessage());
+            out.println("/logout : "+result);
+        }
+        return result;
     }
 
 	@RequestMapping(value="/position", method=RequestMethod.POST)
@@ -43,7 +64,6 @@ public class SpreadItController {
     public String update_position(@RequestParam("server_id") final int server_id,
     		@RequestParam("latitude") final double latitude, @RequestParam("longitude") final double longitude) {
 		
-		//TODO notify other users in the zone that they should update their list
 		String result;
 		try {
 			SqlHandler.update_location(server_id, latitude, longitude);
@@ -51,8 +71,22 @@ public class SpreadItController {
 			result = "server_id="+server_id+" position updated";
 		} catch (TtlSqlException e) {
 	        out.println("/position : server_id="+server_id+" "+e.getMessage());
-			result = e.getMessage();
-		}
+			return "ttl exception when updating position";
+		} catch (Exception e) {
+            out.println("/position : server_id="+server_id+" "+e.getMessage());
+            return "exception when updating position, that is not a ttl exception";
+        }
+
+        // send the server_id of this user to other connected users in the zone
+        List<User> users;
+        try {
+            users = SqlHandler.retrieve_users(server_id, Application.rayon_diffusion_km);
+            sendMsgToGcm(users, "NEWUSER|"+server_id);
+        }
+        catch (Exception e) {
+            out.println("/position : update of other users failed "+e.getMessage()+" for server_id="+server_id);
+        }
+
         return result;
     }
 
@@ -66,6 +100,9 @@ public class SpreadItController {
         catch (TtlSqlException e) {
             out.println("/reset_ttl : "+e.getMessage()+" for server_id="+server_id);
             return e.getMessage();
+        } catch (Exception e) {
+            out.println("/reset_ttl : server_id="+server_id+" "+e.getMessage());
+            return "exception when resetting ttl, that is not a ttl exception";
         }
 
         out.println("/reset_ttl : success for server_id="+server_id);
@@ -82,6 +119,9 @@ public class SpreadItController {
         catch (TtlSqlException e) {
             out.println("/users : "+e.getMessage()+" for server_id="+server_id);
             return e.getMessage();
+        } catch (Exception e) {
+            out.println("/users : server_id="+server_id+" "+e.getMessage());
+            return "exception when fetching users, that is not a ttl exception";
         }
 
         StringBuilder usersBuilder = new StringBuilder();
@@ -107,6 +147,9 @@ public class SpreadItController {
         catch (TtlSqlException e) {
             out.println("/users : "+e.getMessage()+" for server_id="+server_id);
             return e.getMessage();
+        } catch (Exception e) {
+            out.println("/reset_ttl : server_id="+server_id+" "+e.getMessage());
+            return "exception when resetting ttl, that is not a ttl exception";
         }
 
         try {
