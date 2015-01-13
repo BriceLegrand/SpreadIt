@@ -26,7 +26,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.spreadit.R;
 import com.spreadit.radar.RadarActivity;
 import com.spreadit.splash.SplashScreen;
-import com.spreadit.splash.SplashScreen.AlarmReceiverUsers;
+import com.spreadit.radar.RadarActivity.AlarmReceiverUsers;
 
 public class ComManager implements AsyncResponse
 {
@@ -96,16 +96,13 @@ public class ComManager implements AsyncResponse
 
 	public void startUsersAlarmManager()
 	{
-		mAlarmMgrUsers = (AlarmManager) mContext
-				.getSystemService(Context.ALARM_SERVICE);
+		mAlarmMgrUsers = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 		long duration = 1000 * 60 * 5;
 		mAlarmMgrUsers.setInexactRepeating(
 				AlarmManager.ELAPSED_REALTIME_WAKEUP, duration,
 				duration, mAlarmIntentUsers);
-		Intent intent2 = new Intent(mContext,
-				AlarmReceiverUsers.class);
-		mAlarmIntentUsers = PendingIntent.getBroadcast(
-				mContext, 0, intent2, 0);
+		Intent intent2 = new Intent(mContext, AlarmReceiverUsers.class);
+		mAlarmIntentUsers = PendingIntent.getBroadcast(mContext, 0, intent2, 0);
 	}
 
 

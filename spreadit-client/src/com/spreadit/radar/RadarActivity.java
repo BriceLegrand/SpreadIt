@@ -1,14 +1,18 @@
 package com.spreadit.radar;
 
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -35,6 +39,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.spreadit.R;
 import com.spreadit.network.ComManager;
+import com.spreadit.radar.CirclesCanvasAnimation.Circle;
 import com.spreadit.utils.ActionItem;
 import com.spreadit.utils.QuickAction;
 
@@ -55,6 +60,10 @@ public class RadarActivity extends Activity
 	private Map<String, Button>		mCloseUsers;
 
 	private ComManager				mComManager;
+	
+	private CanvasAnimationView		mAnimationView;
+	
+	private CirclesCanvasAnimation	mCirclesAnimation;
 
 
 	public 	static final String 	SAVED_STATE_ACTION_BAR_HIDDEN 	= "saved_state_action_bar_hidden";
@@ -62,7 +71,7 @@ public class RadarActivity extends Activity
 	private static final float 		ACTION_BAR_TITLE_SIZE 			= 37.0f;
 	private static final float 		SCREEN_X_MAX 					= 1000.0f;
 	private static final float		SCREEN_Y_MAX					= 1220.0f;
-	//private static final int		NB_CLOSE_USERS					= 5;
+	private static final int		WAVE_DURATION					= 5000;
 	private static final int		CLOSE_USER_DIM					= 100;  //dp
 
 	private static final int[] btnCenterBg = { R.drawable.btn_add_msg, R.drawable.btn_send_msg };
@@ -80,6 +89,12 @@ public class RadarActivity extends Activity
 		mComManager.startUsersAlarmManager();
 
 		mainContent = (RelativeLayout) findViewById(R.id.mainContent);
+		
+		mAnimationView = (CanvasAnimationView) findViewById(R.id.wave_view);
+		mCirclesAnimation = new CirclesCanvasAnimation(WAVE_DURATION, true);
+		
+		Button btnNewMsg = (Button) findViewById(R.id.btnNewMsg);
+		btnNewMsg.setY(mAnimationView.getHeight()+getActionBarHeight()/2);
 
 		buildActionBar();
 		buildHistory();
@@ -120,6 +135,7 @@ public class RadarActivity extends Activity
 				if( !bDisplayMsg )
 				{
 					mNewMsg.setVisibility(View.VISIBLE);
+					mNewMsg.setY(mNewMsg.getY() + 40);
 					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[1]));
 					bDisplayMsg = true;
 
@@ -147,6 +163,7 @@ public class RadarActivity extends Activity
 						mComManager.sendMessage(mNewMsg.getText().toString());
 						mNewMsg.setText("");
 						//start the wave
+						launchCircleAnimation(v);
 					}
 					//at end of wave trigger change of button
 					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[0]));
@@ -451,6 +468,41 @@ public class RadarActivity extends Activity
 		Log.d("DEBUGTUTUR", "radar activity onDestroy");
 		mComManager.sendLogout();
 		super.onDestroy();
+	}
+	
+	public void launchCircleAnimation(View view)
+	{
+		final Collection<Circle> circles = new ArrayList<Circle>();
+		final int minRadiusMaxValue = Math.min(mAnimationView.getMeasuredWidth(), mAnimationView.getMeasuredHeight());
+		for (int i = 0; i < 5; i ++)
+		{
+			final int x = mAnimationView.getMeasuredWidth()/2;
+			final int y = mAnimationView.getMeasuredHeight()/2 - getActionBar().getHeight()/2;
+			int minRadius = 0;
+			if(i==1)
+				minRadius = 100;
+			else
+				minRadius = 100 + i*100;
+			final int color = Color.rgb(255, 164, 104);
+			circles.add(new Circle(x, y, minRadius, minRadiusMaxValue, color));
+		}
+		mCirclesAnimation.setCircles(circles);
+
+		mAnimationView.setCanvasAnimation(mCirclesAnimation);
+		mAnimationView.startCanvasAnimation();
+	}
+	
+	/*
+	 * Inner class receiving the alarmIntent responsible of /users
+	 */
+	public class AlarmReceiverUsers extends BroadcastReceiver
+	{
+		@Override
+		public void onReceive(Context context, Intent intent)
+		{
+			mComManager.getSurroundingUsers();
+			Log.d("tag", "Surrounding users updated.");
+		}
 	}
 
 }
