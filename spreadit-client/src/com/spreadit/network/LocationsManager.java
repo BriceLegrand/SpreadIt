@@ -33,6 +33,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 	private Double longitude;
 
 	private boolean bIsSplashOn;
+	private boolean bIsLocationAlreadySent;
 
 
 	public LocationsManager(Context appContext)
@@ -79,7 +80,16 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 	@Override
 	public void onConnected(Bundle arg0)
 	{
-		Toast.makeText(this.getMainAct(), "Connected", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(this.getMainAct(), "Connected", Toast.LENGTH_SHORT).show();
+		if(bIsSplashOn)
+		{
+			Intent intentLog = new Intent(this.mAppContext, SplashScreen.class);
+			intentLog.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intentLog.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+			intentLog.putExtra("logConnexion", "DONE");
+			this.mAppContext.startActivity(intentLog);
+		}
 
 		Location currentLoc = mLocationClient.getLastLocation();
 
@@ -116,8 +126,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 
 		// Set the update interval to 2 minutes
 		mLocationRequest.setInterval(120000);
-		// Set the fastest update interval to 1 second
-		mLocationRequest.setFastestInterval(1000);
+		// Set the fastest update interval to 50 seconds
+		mLocationRequest.setFastestInterval(50000);
 
 		mLocationClient.connect();
 	}
@@ -173,21 +183,29 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 		latitude = currentLoc.getLatitude();
 		longitude = currentLoc.getLongitude();
 		Intent intent2open;
-		if(bIsSplashOn)
+		if(!bIsLocationAlreadySent && bIsSplashOn)
 		{
+			bIsLocationAlreadySent = true;
 			intent2open = new Intent(this.mAppContext, SplashScreen.class);
+			intent2open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent2open.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+			intent2open.putExtra("latitude", latitude.toString());
+			intent2open.putExtra("longitude", longitude.toString());
+
+			this.mAppContext.startActivity(intent2open);
 		}
-		else
+		else if(!bIsSplashOn)
 		{
 			intent2open = new Intent(this.mAppContext, RadarActivity.class);
+			intent2open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent2open.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+			intent2open.putExtra("latitude", latitude.toString());
+			intent2open.putExtra("longitude", longitude.toString());
+
+			this.mAppContext.startActivity(intent2open);
 		}
-		intent2open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent2open.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-		intent2open.putExtra("latitude", latitude.toString());
-		intent2open.putExtra("longitude", longitude.toString());
-
-		this.mAppContext.startActivity(intent2open);
 	}
 
 }
