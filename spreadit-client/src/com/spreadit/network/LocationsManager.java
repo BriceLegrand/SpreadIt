@@ -33,6 +33,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 	private Double longitude;
 
 	private boolean bIsSplashOn;
+	private boolean bIsLocationAlreadySent;
 
 
 	public LocationsManager(Context appContext)
@@ -89,7 +90,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 			intentLog.putExtra("logConnexion", "DONE");
 			this.mAppContext.startActivity(intentLog);
 		}
-		
+
 		Location currentLoc = mLocationClient.getLastLocation();
 
 		if (currentLoc == null)
@@ -182,21 +183,29 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 		latitude = currentLoc.getLatitude();
 		longitude = currentLoc.getLongitude();
 		Intent intent2open;
-		if(bIsSplashOn)
+		if(!bIsLocationAlreadySent && bIsSplashOn)
 		{
+			bIsLocationAlreadySent = true;
 			intent2open = new Intent(this.mAppContext, SplashScreen.class);
+			intent2open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent2open.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+			intent2open.putExtra("latitude", latitude.toString());
+			intent2open.putExtra("longitude", longitude.toString());
+
+			this.mAppContext.startActivity(intent2open);
 		}
-		else
+		else if(!bIsSplashOn)
 		{
 			intent2open = new Intent(this.mAppContext, RadarActivity.class);
+			intent2open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent2open.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+			intent2open.putExtra("latitude", latitude.toString());
+			intent2open.putExtra("longitude", longitude.toString());
+
+			this.mAppContext.startActivity(intent2open);
 		}
-		intent2open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent2open.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-		intent2open.putExtra("latitude", latitude.toString());
-		intent2open.putExtra("longitude", longitude.toString());
-
-		this.mAppContext.startActivity(intent2open);
 	}
 
 }
