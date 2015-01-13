@@ -1,7 +1,6 @@
 package com.spreadit.splash;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -101,18 +100,5 @@ public class SplashScreen extends Activity
 					+ lon + " for servid : " + mComManager.getServer_id());
 		}
 
-	}
-
-	/*
-	 * Inner class receiving the alarmIntent responsible of /users
-	 */
-	public class AlarmReceiverUsers extends BroadcastReceiver
-	{
-		@Override
-		public void onReceive(Context context, Intent intent)
-		{
-			mComManager.getSurroundingUsers();
-			Log.d("tag", "Surrounding users updated.");
-		}
 	}
 }
