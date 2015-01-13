@@ -79,8 +79,17 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 	@Override
 	public void onConnected(Bundle arg0)
 	{
-		Toast.makeText(this.getMainAct(), "Connected", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(this.getMainAct(), "Connected", Toast.LENGTH_SHORT).show();
+		if(bIsSplashOn)
+		{
+			Intent intentLog = new Intent(this.mAppContext, SplashScreen.class);
+			intentLog.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intentLog.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
+			intentLog.putExtra("logConnexion", "DONE");
+			this.mAppContext.startActivity(intentLog);
+		}
+		
 		Location currentLoc = mLocationClient.getLastLocation();
 
 		if (currentLoc == null)
