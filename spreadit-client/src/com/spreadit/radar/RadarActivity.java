@@ -464,7 +464,7 @@ public class RadarActivity extends Activity
 	@Override
 	public void onDestroy()
 	{
-		mComManager.sendLogout();
+		//mComManager.sendLogout();
 		super.onDestroy();
 	}
 	

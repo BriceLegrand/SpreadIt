@@ -125,8 +125,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 
 		// Set the update interval to 2 minutes
 		mLocationRequest.setInterval(120000);
-		// Set the fastest update interval to 1 second
-		mLocationRequest.setFastestInterval(1000);
+		// Set the fastest update interval to 20 seconds
+		mLocationRequest.setFastestInterval(20000);
 
 		mLocationClient.connect();
 	}
