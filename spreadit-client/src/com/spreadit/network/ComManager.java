@@ -75,7 +75,7 @@ public class ComManager implements AsyncResponse
 	{
 		bIsLocationEnabled = false;
 		users = new ArrayList<String>();
-		servUrl = "http://192.168.1.61:8080";
+		servUrl = "http://192.168.43.210:8080";
 		//msgId = new AtomicInteger();
 		mContext = SplashScreen.AppContext;
 		locManager = new LocationsManager(mContext);
