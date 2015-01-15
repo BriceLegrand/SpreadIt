@@ -38,24 +38,6 @@ public class SplashScreen extends Activity
 		mComManager = ComManager.getInstance();
 		mComManager.connectAndGetGcmId(this);
 		mComManager.setMainAct(this);
-
-		/*
-		 * New Handler to start the Menu-Activity and close this Splash-Screen
-		 * after some seconds.
-		 */
-		// new Handler().postDelayed(new Runnable(){
-		// @Override
-		// public void run() {
-		/* Create an Intent that will start the Menu-Activity. */
-		// if(mComManager.isLocationEnabled())
-		// {
-		// Intent mainIntent = new Intent(SplashScreen.this,
-		// RadarActivity.class);
-		// SplashScreen.this.startActivity(mainIntent);
-		// SplashScreen.this.finish();
-		// }
-		// }
-		// }, SPLASH_DISPLAY_LENGTH);
 	}
 	
 	@Override
@@ -83,9 +65,7 @@ public class SplashScreen extends Activity
 	@Override
 	protected void onNewIntent(Intent intent)
 	{
-		// Case 1 : La localisation est prete, lancer l'alarme sur la recup des
-		// users tous les
-		// x time
+		// Case 1 : La localisation est prete, lancer l'alarme sur la recup des users tous les x time
 		if (intent.getStringExtra("LocReady") != null)
 		{
 			if (intent.getStringExtra("LocReady").equals("DONE"))
