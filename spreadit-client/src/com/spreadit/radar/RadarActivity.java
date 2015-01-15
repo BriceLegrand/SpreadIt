@@ -262,34 +262,36 @@ public class RadarActivity extends Activity
 	{
 		mCloseUsers.clear();
 		int i;
-		//for(i = 0; i < NB_CLOSE_USERS; ++i)
 		for(i = 0; i < mComManager.getUsers().size(); ++i)
 		{
-			Button user = new Button(getBaseContext());
-			user.setBackground(getResources().getDrawable(R.drawable.btn_close_user));
-			user.setLayoutParams(new LayoutParams(CLOSE_USER_DIM, CLOSE_USER_DIM));
-
-			Random fate = new Random();
-			user.setX(fate.nextInt(Math.round(SCREEN_X_MAX)));
-			user.setY(fate.nextInt(Math.round(SCREEN_Y_MAX)));
-			final float MIDDLE_SCREEN_X = SCREEN_X_MAX / 2.0f;
-			while( (user.getX() > (MIDDLE_SCREEN_X - 120.0f) && user.getX() < (MIDDLE_SCREEN_X + 120.0f)) 
-					&& (user.getY() > 520.0f && user.getY() < 800.0f) )
-			{
-				user.setX(fate.nextInt(Math.round(SCREEN_X_MAX)));
-				user.setY(fate.nextInt(Math.round(SCREEN_Y_MAX)));
-			}
-
 			View v = mainContent.findViewWithTag("userView" + i);
 			if(v != null)
 			{
 				mainContent.removeView(v);
 			}
-			user.setTag("userView" + i);
-			mainContent.addView(user);
-			mCloseUsers.put(mComManager.getUsers().get(i).toString(), user);
-			//mCloseUsers.put(Integer.toString(i), user);
+			addNewCloseUser(mComManager.getUsers().get(i).toString(), i);
 		}
+	}
+	
+	private void addNewCloseUser(String serverId, int tag)
+	{
+		Button user = new Button(getBaseContext());
+		user.setBackground(getResources().getDrawable(R.drawable.btn_close_user));
+		user.setLayoutParams(new LayoutParams(CLOSE_USER_DIM, CLOSE_USER_DIM));
+
+		Random fate = new Random();
+		user.setX(fate.nextInt(Math.round(SCREEN_X_MAX)));
+		user.setY(fate.nextInt(Math.round(SCREEN_Y_MAX)));
+		final float MIDDLE_SCREEN_X = SCREEN_X_MAX / 2.0f;
+		while( (user.getX() > (MIDDLE_SCREEN_X - 120.0f) && user.getX() < (MIDDLE_SCREEN_X + 120.0f)) 
+				&& (user.getY() > 520.0f && user.getY() < 800.0f) )
+		{
+			user.setX(fate.nextInt(Math.round(SCREEN_X_MAX)));
+			user.setY(fate.nextInt(Math.round(SCREEN_Y_MAX)));
+		}
+		user.setTag("userView" + tag);
+		mainContent.addView(user);
+		mCloseUsers.put(serverId, user);
 	}
 
 	@Override
@@ -413,7 +415,9 @@ public class RadarActivity extends Activity
 
 		String lat = intent.getStringExtra("latitude");
 		String lon = intent.getStringExtra("longitude");
-
+		
+		String newUser = intent.getStringExtra("new_user");
+		
 		final String currentMessage = intent.getStringExtra("msg");
 		final String currentServerId = intent.getStringExtra("server_id");
 		
@@ -454,8 +458,13 @@ public class RadarActivity extends Activity
 		else if (lat != null)
 		{
 			mComManager.sendLocation(Double.valueOf(lat), Double.valueOf(lon));
-			buildCloseUsers();
+			//buildCloseUsers();
 			Log.d("tag", "sent location. Latitude : " + lat + " longitude : " + lon + " for servid : " + mComManager.getServer_id());
+		}
+		//		Case 3 : A new user is located
+		else if (newUser != null)
+		{
+			addNewCloseUser(newUser, mCloseUsers.size());
 		}
 
 		super.onNewIntent(intent);

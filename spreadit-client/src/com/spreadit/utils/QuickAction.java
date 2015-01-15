@@ -252,7 +252,9 @@ public class QuickAction extends PopupWindows implements OnDismissListener
 			rootWidth		= mRootView.getMeasuredWidth();
 		}
 
+		@SuppressWarnings("deprecation")
 		int screenWidth 	= mWindowManager.getDefaultDisplay().getWidth();
+		@SuppressWarnings("deprecation")
 		int screenHeight	= mWindowManager.getDefaultDisplay().getHeight();
 
 		//automatically get X coord of popup (top left)
