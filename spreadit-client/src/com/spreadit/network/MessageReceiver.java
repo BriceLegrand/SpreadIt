@@ -17,21 +17,29 @@ public class MessageReceiver extends BroadcastReceiver
 	public void onReceive(Context context, Intent intent)
 	{
 		String nameMsg = "msg";
-		String messageEtServerId = intent.getExtras().getString(nameMsg);
-		Log.d("tag","Message received from GCM " + messageEtServerId);
+		String messageOuNewUserEtServerId = intent.getExtras().getString(nameMsg);
 		
 		Intent intent2open = new Intent(context, RadarActivity.class);
 		intent2open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent2open.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		
-		String valueMsg = messageEtServerId.substring(messageEtServerId.lastIndexOf('|') + 1);
-		intent2open.putExtra(nameMsg, valueMsg);
-		
-		String nameServerId = "server_id";
-		String valueServerId = messageEtServerId.substring(0, messageEtServerId.lastIndexOf('|'));
-		intent2open.putExtra(nameServerId, valueServerId);
-		
-		context.startActivity(intent2open);
+		if(messageOuNewUserEtServerId != null)
+		{
+			String key = messageOuNewUserEtServerId.substring(0, messageOuNewUserEtServerId.lastIndexOf('|'));
+			String nameServerId = "server_id";
+			if(key.equals("NEWUSER"))
+			{
+				Log.d("tag","New user received from GCM " + messageOuNewUserEtServerId);
+				String valueServerId = messageOuNewUserEtServerId.substring(messageOuNewUserEtServerId.lastIndexOf('|') + 1);
+				intent2open.putExtra("new_user", valueServerId);
+			}
+			else
+			{
+				Log.d("tag","Message received from GCM " + messageOuNewUserEtServerId);
+				String valueMsg = messageOuNewUserEtServerId.substring(messageOuNewUserEtServerId.lastIndexOf('|') + 1);
+				intent2open.putExtra(nameServerId, key);
+				intent2open.putExtra(nameMsg, valueMsg);
+			}
+			context.startActivity(intent2open);
+		}
 	}
-
 }

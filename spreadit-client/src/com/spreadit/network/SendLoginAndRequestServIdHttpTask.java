@@ -17,6 +17,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 class SendLoginAndRequestServIdHttpTask extends AsyncTask<String, String, String> {
 	/*
@@ -37,7 +38,6 @@ class SendLoginAndRequestServIdHttpTask extends AsyncTask<String, String, String
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
 			nameValuePairs.add(new BasicNameValuePair("gcm_id", params[1]));
 			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
 			response = httpclient.execute(httppost);
 			StatusLine statusLine = response.getStatusLine();
 			if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
@@ -53,6 +53,7 @@ class SendLoginAndRequestServIdHttpTask extends AsyncTask<String, String, String
 		} catch (ClientProtocolException e) {
 			// TODO Handle problems..
 		} catch (IOException e) {
+			Log.d("tag", "IOException : " + e.toString());
 			// TODO Handle problems..
 		}
 		return responseString;

@@ -80,7 +80,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 	@Override
 	public void onConnected(Bundle arg0)
 	{
-		//Toast.makeText(this.getMainAct(), "Connected", Toast.LENGTH_SHORT).show();
 		if(bIsSplashOn)
 		{
 			Intent intentLog = new Intent(this.mAppContext, SplashScreen.class);
@@ -115,7 +114,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 	@Override
 	public void onDisconnected()
 	{
-		// TODO Auto-generated method stub
 		Toast.makeText(this.getMainAct(), "Disconnected. Please re-connect.",
 				Toast.LENGTH_SHORT).show();
 	}
@@ -124,10 +122,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, LocationListener
 	{
 		mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
-		// Set the update interval to 2 minutes
-		mLocationRequest.setInterval(120000);
-		// Set the fastest update interval to 20 seconds
-		mLocationRequest.setFastestInterval(20000);
+		// Set the update interval to 30s
+		mLocationRequest.setInterval(30000);
+		// Set the fastest update interval to 5 seconds
+		mLocationRequest.setFastestInterval(5000);
 
 		mLocationClient.connect();
 	}

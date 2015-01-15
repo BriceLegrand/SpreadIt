@@ -23,7 +23,6 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.internal.ml;
 import com.spreadit.R;
 import com.spreadit.radar.RadarActivity;
 import com.spreadit.splash.SplashScreen;
@@ -60,8 +59,6 @@ public class ComManager implements AsyncResponse {
 
 	private static Context mContext;
 	private GoogleCloudMessaging gcm;
-	// private AtomicInteger msgId;
-	// private SharedPreferences prefs;
 	private String regid;
 	private String serverId;
 
@@ -74,8 +71,8 @@ public class ComManager implements AsyncResponse {
 		bIsLocationEnabled = false;
 		users = new ArrayList<String>();
 		// servUrl = "http://192.168.0.42:8080";
-		servUrl = "http://192.168.43.210:8080";
-		// msgId = new AtomicInteger();
+		servUrl = "http://192.168.0.12:8080";
+		//servUrl = "http://192.168.43.202:8080";
 		mContext = SplashScreen.AppContext;
 		locManager = new LocationsManager(mContext);
 		SENDER_ID = "168328884942";
@@ -162,16 +159,13 @@ public class ComManager implements AsyncResponse {
 
 	@Override
 	public void processReqServIdFinish(String serverId) {
-		// this you will received result fired from async class of
-		// onPostExecute(result) method of RequestServerIdHttpTask.
+		// this you will receive result fired from async class of onPostExecute(result) method of RequestServerIdHttpTask.
 		Log.d("tag", "http result from process Finish " + serverId);
 		this.setServer_id(serverId);
 
-		
-		// We send location during connection after having verified that
-		// location services are activated
-		if (checkAndAskForLocationTrackingEnabled()
-				&& !locManager.isTrackingStarted())
+
+		// We send location during connection after having verified that location services are activated
+		if (checkAndAskForLocationTrackingEnabled() && !locManager.isTrackingStarted())
 			locManager.startLocationTracking();
 
 	}
@@ -187,8 +181,7 @@ public class ComManager implements AsyncResponse {
 	public void processSendLocationFinish() {
 		Log.d("tag", "Location successfully sent");
 		if (locManager.isSplashOn()) {
-			Intent mainIntent = new Intent(this.getMainAct(),
-					SplashScreen.class);
+			Intent mainIntent = new Intent(this.getMainAct(), SplashScreen.class);
 			mainIntent.putExtra("LocReady", "DONE");
 			mainIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -428,18 +421,12 @@ public class ComManager implements AsyncResponse {
 	}
 
 	public void processGetSurroundingUsersFinish(String response) {
-		if (response != null) {
+		if (response != null) 
+		{
 			if (!response.equals(""))
 				users = Arrays.asList(response.split(","));
-			if (!response.equals("Time to live expired or user not logged in")) { // on
-																					// est
-																					// plus
-																					// sensé
-																					// envoyer
-																					// des
-																					// intent
-																					// au
-																					// splashscreen
+			if (!response.equals("Time to live expired or user not logged in")) {
+				// on n'est plus sensés envoyer des intent au splashscreen
 				locManager.setIsSplashOn(false);
 				// fin : lancement de Radar activity
 				Intent mainIntent = new Intent(this.getMainAct(),
@@ -475,31 +462,26 @@ public class ComManager implements AsyncResponse {
 			bIsLocationEnabled = false;
 			Log.d("tag", "location still unavailable");
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(
-					this.getMainAct());
+			AlertDialog.Builder builder = new AlertDialog.Builder(this.getMainAct());
 			builder.setMessage(
 					"This application needs location tracking, do you want to open Android System location services ?")
 					.setPositiveButton(R.string.fire,
 							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									Intent gpsOptionsIntent = new Intent(
-											android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-									gpsOptionsIntent
-											.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-									gpsOptionsIntent
-											.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-									mContext.startActivity(gpsOptionsIntent);
-								}
-							})
+						public void onClick(DialogInterface dialog,
+								int id) {
+							Intent gpsOptionsIntent = new Intent(
+									android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+							gpsOptionsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							gpsOptionsIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+							mContext.startActivity(gpsOptionsIntent);
+						}
+					})
 					.setNegativeButton(R.string.cancel,
 							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									ComManager.this.getMainAct().finish();
-								}
-							});
+						public void onClick(DialogInterface dialog, int id) {
+							ComManager.this.getMainAct().finish();
+						}
+					});
 
 			AlertDialog alertDialog = builder.create();
 			Log.d("tag", "alertbuilder created");
