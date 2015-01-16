@@ -14,7 +14,10 @@
     <string name="connexion">Connexion…</string>
     <string name="geolocalisation">Géolocalisation…</string>
     
-    <string name="fire">Yes</string>
-    <string name="cancel">No, quit application.</string>
+    <string name="fire">Oui</string>
+    <string name="cancel">Non, quitter l\'application.</string>
+    
+    <string name="quitApp">Oui, quitter l\'application.</string>
+    <string name="cancelQuit">Non</string>
 
 </resources>

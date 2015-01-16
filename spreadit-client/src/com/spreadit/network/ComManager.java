@@ -70,8 +70,7 @@ public class ComManager implements AsyncResponse {
 	private ComManager() {
 		bIsLocationEnabled = false;
 		users = new ArrayList<String>();
-		// servUrl = "http://192.168.0.42:8080";
-		servUrl = "http://192.168.0.12:8080";
+		servUrl = "http://62.210.236.244:8080";
 		//servUrl = "http://192.168.43.202:8080";
 		mContext = SplashScreen.AppContext;
 		locManager = new LocationsManager(mContext);
@@ -464,7 +463,7 @@ public class ComManager implements AsyncResponse {
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this.getMainAct());
 			builder.setMessage(
-					"This application needs location tracking, do you want to open Android System location services ?")
+					"Cette application recquiert l'activation de la géolocalisation, voulez-vous l'activer ?")
 					.setPositiveButton(R.string.fire,
 							new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,

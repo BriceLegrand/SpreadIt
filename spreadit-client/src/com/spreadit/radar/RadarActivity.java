@@ -9,8 +9,10 @@ import java.util.Random;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -68,6 +70,11 @@ public class RadarActivity extends Activity
 
 	public 	static final String 	SAVED_STATE_ACTION_BAR_HIDDEN 	= "saved_state_action_bar_hidden";
 	private static final String 	ACTION_BAR_TITLE_FONT 			= "fonts/intriquescript.ttf";
+	private static final String		KEY_LATITUDE					= "latitude";
+	private static final String		KEY_LONGITUDE					= "longitude";
+	private static final String		KEY_SERVERID					= "server_id";
+	private static final String		KEY_MESSAGE						= "msg";
+	private static final String		KEY_NEWUSER						= "new_user";
 	private static final float 		ACTION_BAR_TITLE_SIZE 			= 37.0f;
 	private static final float 		SCREEN_X_MAX 					= 1000.0f;
 	private static final float		SCREEN_Y_MAX					= 1220.0f;
@@ -193,8 +200,6 @@ public class RadarActivity extends Activity
 		mHistoryLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 		mHistoryList = (ListView) findViewById(R.id.historyList);
 		//mHistoryList.setAdapter(mHistoryListAdapter); TODO: create an adapter
-		//String[] values = new String[] { "#API12 So Fresh !", "Such concert #Amaze",
-		//		"Alea Jacta #Est", "Avé #Cesar", "Android & SMA #API12" };
 		mHistoryAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 		mHistoryList.setAdapter(mHistoryAdapter);
 
@@ -413,13 +418,13 @@ public class RadarActivity extends Activity
 	{
 		Log.d("Radar", "onNewIntent is called!");
 
-		String lat = intent.getStringExtra("latitude");
-		String lon = intent.getStringExtra("longitude");
+		String lat = intent.getStringExtra(KEY_LATITUDE);
+		String lon = intent.getStringExtra(KEY_LONGITUDE);
 		
-		String newUser = intent.getStringExtra("new_user");
+		String newUser = intent.getStringExtra(KEY_NEWUSER);
 		
-		final String currentMessage = intent.getStringExtra("msg");
-		final String currentServerId = intent.getStringExtra("server_id");
+		final String currentMessage = intent.getStringExtra(KEY_MESSAGE);
+		final String currentServerId = intent.getStringExtra(KEY_SERVERID);
 		
 		//		 Case 1 : A message is received and displayed
 		if (currentMessage != null && currentServerId != null) 
@@ -469,12 +474,33 @@ public class RadarActivity extends Activity
 
 		super.onNewIntent(intent);
 	}
-
-	@Override
-	public void onDestroy()
+	
+	private void buildQuitDialog()
 	{
-		//mComManager.sendLogout();
-		super.onDestroy();
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(
+				"Êtes-vous sûr de vouloir quitter l'application ?")
+				.setPositiveButton(R.string.quitApp,
+						new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						mComManager.sendLogout();
+						RadarActivity.super.onDestroy();
+						System.exit(0);
+					}
+				})
+				.setNegativeButton(R.string.cancelQuit,
+						new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					}
+				});
+		AlertDialog alertDialog = builder.create();
+		alertDialog.show();
+	}
+	
+	@Override
+	public void onBackPressed()
+	{
+		buildQuitDialog();
 	}
 	
 	public void launchCircleAnimation(View view)
