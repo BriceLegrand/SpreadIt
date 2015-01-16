@@ -41,6 +41,9 @@ proguard/
 # # TeXlipse plugin
 # .texlipse
 
+#eclipse
+.project
+
 .metadata/
 
 #Intellij idea files
