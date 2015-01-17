@@ -496,7 +496,7 @@ public class RadarActivity extends Activity
 						new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						mComManager.sendLogout();
-						RadarActivity.super.onDestroy();
+						finish();
 						System.exit(0);
 					}
 				})
@@ -514,6 +514,14 @@ public class RadarActivity extends Activity
 	{
 		buildQuitDialog();
 	}
+	
+	@Override 
+	public void onDestroy() {
+		super.onDestroy();
+		mComManager.sendLogout();
+	}
+	
+	
 	
 	public void launchCircleAnimation(View view)
 	{
