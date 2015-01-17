@@ -79,7 +79,8 @@ public class RadarActivity extends Activity
 	private static final float 		SCREEN_X_MAX 					= 1000.0f;
 	private static final float		SCREEN_Y_MAX					= 1220.0f;
 	private static final int		WAVE_DURATION					= 5000;
-	private static final int		CLOSE_USER_DIM					= 100;  //dp
+	private static final int		CLOSE_USER_DIM					= 80;  //dp
+	private static final int		NOTIFICATION_DIM				= 140;  //dp
 
 	private static final int[] btnCenterBg = { R.drawable.btn_add_msg, R.drawable.btn_send_msg };
 
@@ -435,10 +436,18 @@ public class RadarActivity extends Activity
 				mHistoryAdapter.add(currentMessage);
 			}
 			//Update close users messages
-			Button user = mCloseUsers.get(currentServerId);
+			final Button user = mCloseUsers.get(currentServerId);
 			if(user != null)
 			{
-				user.setOnClickListener(new OnClickListener()
+				final Button notif = new Button(getBaseContext());
+				notif.setBackground(getResources().getDrawable(R.drawable.notification));
+				int[] location = new int[2];
+				user.getLocationOnScreen(location);
+				notif.setX(location[0] - 30.0f);
+				notif.setY(user.getY() - 255.0f);
+				notif.setLayoutParams(new LayoutParams(NOTIFICATION_DIM, NOTIFICATION_DIM));
+				mainContent.addView(notif);
+				OnClickListener readingMessage = (new OnClickListener()
 				{
 					@Override
 					public void onClick(View v)
@@ -454,9 +463,12 @@ public class RadarActivity extends Activity
 								mComManager.sendMessage(currentMessage); // THE SPREAD
 							}
 						});
-						quickAction.show(v);
+						quickAction.show(user);
+						mainContent.removeView(notif);
 					}
 				});
+				user.setOnClickListener(readingMessage);
+				notif.setOnClickListener(readingMessage);
 			}
 		}
 		//		 Case 2 : A new location is received and sent to server
