@@ -143,7 +143,8 @@ public class RadarActivity extends Activity
 				{
 					mNewMsg.setVisibility(View.VISIBLE);
 					mNewMsg.setY(mNewMsg.getY() + 40);
-					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[1]));
+					// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
+					btnNewMsg.setBackgroundDrawable(getResources().getDrawable(btnCenterBg[1]));
 					bDisplayMsg = true;
 
 					mHistoryLayout.hidePanel();
@@ -173,7 +174,8 @@ public class RadarActivity extends Activity
 						launchCircleAnimation(v);
 					}
 					//at end of wave trigger change of button
-					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[0]));
+					// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
+					btnNewMsg.setBackgroundDrawable(getResources().getDrawable(btnCenterBg[0]));
 					bDisplayMsg = false;
 
 					mHistoryLayout.showPanel();
@@ -282,7 +284,8 @@ public class RadarActivity extends Activity
 	private void addNewCloseUser(String serverId, int tag)
 	{
 		Button user = new Button(getBaseContext());
-		user.setBackground(getResources().getDrawable(R.drawable.btn_close_user));
+		// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
+		user.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_close_user));
 		user.setLayoutParams(new LayoutParams(CLOSE_USER_DIM, CLOSE_USER_DIM));
 
 		Random fate = new Random();
@@ -440,7 +443,8 @@ public class RadarActivity extends Activity
 			if(user != null)
 			{
 				final Button notif = new Button(getBaseContext());
-				notif.setBackground(getResources().getDrawable(R.drawable.notification));
+				// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
+				notif.setBackgroundDrawable(getResources().getDrawable(R.drawable.notification));
 				int[] location = new int[2];
 				user.getLocationOnScreen(location);
 				notif.setX(location[0] - 30.0f);
