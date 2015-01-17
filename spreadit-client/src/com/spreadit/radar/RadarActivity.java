@@ -66,7 +66,11 @@ public class RadarActivity extends Activity
 	private CanvasAnimationView		mAnimationView;
 	
 	private CirclesCanvasAnimation	mCirclesAnimation;
-
+	
+	private float					mYNewMsg;
+	
+	private boolean					bClickedOnce;
+	
 
 	public 	static final String 	SAVED_STATE_ACTION_BAR_HIDDEN 	= "saved_state_action_bar_hidden";
 	private static final String 	ACTION_BAR_TITLE_FONT 			= "fonts/intriquescript.ttf";
@@ -101,7 +105,7 @@ public class RadarActivity extends Activity
 		mCirclesAnimation = new CirclesCanvasAnimation(WAVE_DURATION, true);
 		
 		Button btnNewMsg = (Button) findViewById(R.id.btnNewMsg);
-		btnNewMsg.setY(mAnimationView.getHeight()+getActionBarHeight()/2);
+		btnNewMsg.setY(mAnimationView.getHeight() + getActionBarHeight() / 2);
 
 		buildActionBar();
 		buildHistory();
@@ -113,6 +117,7 @@ public class RadarActivity extends Activity
 		mNewMsg.setVisibility(View.GONE);
 
 		bDisplayMsg = false;
+		bClickedOnce = false;
 
 		boolean actionBarHidden = savedInstanceState != null && savedInstanceState.getBoolean(SAVED_STATE_ACTION_BAR_HIDDEN, false);
 		if (actionBarHidden) 
@@ -134,15 +139,28 @@ public class RadarActivity extends Activity
 		mainContent = (RelativeLayout) findViewById(R.id.mainContent);
 		final Button btnNewMsg = (Button) findViewById(R.id.btnNewMsg);
 		final Activity current = this;
+		mYNewMsg = mNewMsg.getY();
 		btnNewMsg.setOnClickListener(new OnClickListener()
 		{
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-ge	nerated method stub
 				if( !bDisplayMsg )
 				{
 					mNewMsg.setVisibility(View.VISIBLE);
-					mNewMsg.setY(mNewMsg.getY() + 40);
+					if(mYNewMsg < 0.1f)
+					{
+						mYNewMsg = mNewMsg.getY() + 40.0f;
+						mNewMsg.setY(mYNewMsg);
+					}
+					else
+					{
+						if( !bClickedOnce )
+						{
+							mYNewMsg = mNewMsg.getY();
+							bClickedOnce = true;
+						}
+						mNewMsg.setY(mYNewMsg + 40.0f);
+					}
 					// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
 					btnNewMsg.setBackgroundDrawable(getResources().getDrawable(btnCenterBg[1]));
 					bDisplayMsg = true;
