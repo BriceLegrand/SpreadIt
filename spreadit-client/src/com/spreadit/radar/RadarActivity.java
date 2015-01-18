@@ -4,8 +4,11 @@ package com.spreadit.radar;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -29,11 +32,14 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +63,8 @@ public class RadarActivity extends Activity
 
 	private ListView 				mHistoryList;
 
+	private ListView				mFilteredHistoryList;
+	
 	private ArrayAdapter<String>	mHistoryAdapter;
 
 	private boolean 				bDisplayMsg;
@@ -286,7 +294,40 @@ public class RadarActivity extends Activity
 			@Override
 			public void onClick(View v) 
 			{
-				Toast.makeText(getApplicationContext(), "Filters on", Toast.LENGTH_SHORT).show();
+				//Set the filter visible or not
+				mFilteredHistoryList = (ListView) findViewById(R.id.filteredHistoryList);
+				Button filterBtn = (Button) findViewById(R.id.historyFilter);
+				LinearLayout selectHashtagsArea = (LinearLayout) findViewById(R.id.selectHashtagsLayout);
+				if(selectHashtagsArea.getVisibility() == View.GONE) {
+					Toast.makeText(getApplicationContext(), "Filters on", Toast.LENGTH_SHORT).show();
+					selectHashtagsArea.setVisibility(View.VISIBLE);
+					filterBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.filters_on));
+					mHistoryList.setVisibility(View.GONE);
+					mFilteredHistoryList.setVisibility(View.VISIBLE);
+				}
+				else {
+					Toast.makeText(getApplicationContext(), "Filters off", Toast.LENGTH_SHORT).show();
+					selectHashtagsArea.setVisibility(View.GONE);
+					filterBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.filter));
+					mHistoryList.setVisibility(View.VISIBLE);
+					mFilteredHistoryList.setVisibility(View.GONE);
+				}
+				
+				//Set the tags in the dropdown list
+				setTagsInSpinner();
+				
+				//Filter on value selection
+				final Spinner s = (Spinner) findViewById(R.id.listTagsSpinner);
+				s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+				    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) { 
+				        // Your code here
+				    	filterList(s.getSelectedItem().toString());
+				    } 
+
+				    public void onNothingSelected(AdapterView<?> adapterView) {
+				        return;
+				    } 
+				}); 
 			}
 		});
 	}
@@ -587,5 +628,45 @@ public class RadarActivity extends Activity
 			Log.d("tag", "Surrounding users updated.");
 		}
 	}
-
+	
+	public void setTagsInSpinner() {
+		//Parse list view to get hashtags
+		List<String> tagList = new ArrayList<String>();
+		for(int i=0 ; i<mHistoryAdapter.getCount() ; i++){
+			String value = mHistoryAdapter.getItem(i).toString();
+			Matcher matcher = Pattern.compile("#(\\w+)").matcher(value);
+			while(matcher.find()) {
+				int it=0;
+				for(String s : tagList) {
+					if(s.equals(matcher.group(0))) {
+						it++;
+					}
+				}
+				if(it==0) {
+					tagList.add(matcher.group(0));
+				}
+			}
+		}
+		
+		//Set the values in the spinner
+		Spinner s = (Spinner) findViewById(R.id.listTagsSpinner);
+		String[] tags = new String[tagList.size()];
+		tags = tagList.toArray(tags);
+		ArrayAdapter<String> newAdapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_item, tags);
+        s.setAdapter(newAdapter);
+	}
+	
+	public void filterList(String tag) {
+		List<String> filteredValues = new ArrayList<String>();
+		for(int i=0 ; i<mHistoryAdapter.getCount() ; i++){
+			String value = mHistoryAdapter.getItem(i).toString();
+			if (value.contains(tag)) {
+				filteredValues.add(value);
+			}
+		}
+		String[] filteredValuesArray = new String[filteredValues.size()];
+		filteredValuesArray = filteredValues.toArray(filteredValuesArray);
+		ArrayAdapter<String> newAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, filteredValuesArray);
+		mFilteredHistoryList.setAdapter(newAdapter);
+	}
 }
