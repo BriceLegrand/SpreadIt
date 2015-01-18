@@ -14,6 +14,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -41,7 +42,9 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.spreadit.R;
 import com.spreadit.network.ComManager;
+import com.spreadit.network.MessageReceiver;
 import com.spreadit.radar.CirclesCanvasAnimation.Circle;
+import com.spreadit.splash.SplashScreen;
 import com.spreadit.utils.ActionItem;
 import com.spreadit.utils.QuickAction;
 
@@ -66,6 +69,9 @@ public class RadarActivity extends Activity
 	private CanvasAnimationView		mAnimationView;
 	
 	private CirclesCanvasAnimation	mCirclesAnimation;
+	
+	private final BroadcastReceiver messageReceiver = new MessageReceiver(); 
+
 
 
 	public 	static final String 	SAVED_STATE_ACTION_BAR_HIDDEN 	= "saved_state_action_bar_hidden";
@@ -94,6 +100,10 @@ public class RadarActivity extends Activity
 		mComManager.setMainAct(this);
 		// AlarmManager pour réception des users
 		mComManager.startUsersAlarmManager();
+		
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("com.google.android.c2dm.intent.RECEIVE");
+		registerReceiver(messageReceiver, filter);
 
 		mainContent = (RelativeLayout) findViewById(R.id.mainContent);
 		
@@ -519,6 +529,10 @@ public class RadarActivity extends Activity
 	public void onDestroy() {
 		super.onDestroy();
 		mComManager.sendLogout();
+		
+		unregisterReceiver(messageReceiver);
+		int pid = android.os.Process.myPid();
+		android.os.Process.killProcess(pid);
 	}
 	
 	
