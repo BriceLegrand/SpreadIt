@@ -44,7 +44,6 @@ import com.spreadit.R;
 import com.spreadit.network.ComManager;
 import com.spreadit.network.MessageReceiver;
 import com.spreadit.radar.CirclesCanvasAnimation.Circle;
-import com.spreadit.splash.SplashScreen;
 import com.spreadit.utils.ActionItem;
 import com.spreadit.utils.QuickAction;
 
@@ -525,8 +524,7 @@ public class RadarActivity extends Activity
 				.setPositiveButton(R.string.quitApp,
 						new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						mComManager.sendLogout();
-						finish();
+						RadarActivity.this.onDestroy();
 						System.exit(0);
 					}
 				})
@@ -554,8 +552,6 @@ public class RadarActivity extends Activity
 		int pid = android.os.Process.myPid();
 		android.os.Process.killProcess(pid);
 	}
-	
-	
 	
 	public void launchCircleAnimation(View view)
 	{
