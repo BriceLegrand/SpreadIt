@@ -72,7 +72,9 @@ public class RadarActivity extends Activity
 	
 	private final BroadcastReceiver messageReceiver = new MessageReceiver(); 
 
-
+	private float					mYNewMsg;
+	
+	private boolean					bClickedOnce;
 
 	public 	static final String 	SAVED_STATE_ACTION_BAR_HIDDEN 	= "saved_state_action_bar_hidden";
 	private static final String 	ACTION_BAR_TITLE_FONT 			= "fonts/intriquescript.ttf";
@@ -111,7 +113,7 @@ public class RadarActivity extends Activity
 		mCirclesAnimation = new CirclesCanvasAnimation(WAVE_DURATION, true);
 		
 		Button btnNewMsg = (Button) findViewById(R.id.btnNewMsg);
-		btnNewMsg.setY(mAnimationView.getHeight()+getActionBarHeight()/2);
+		btnNewMsg.setY(mAnimationView.getHeight() + getActionBarHeight() / 2);
 
 		buildActionBar();
 		buildHistory();
@@ -123,6 +125,7 @@ public class RadarActivity extends Activity
 		mNewMsg.setVisibility(View.GONE);
 
 		bDisplayMsg = false;
+		bClickedOnce = false;
 
 		boolean actionBarHidden = savedInstanceState != null && savedInstanceState.getBoolean(SAVED_STATE_ACTION_BAR_HIDDEN, false);
 		if (actionBarHidden) 
@@ -144,16 +147,30 @@ public class RadarActivity extends Activity
 		mainContent = (RelativeLayout) findViewById(R.id.mainContent);
 		final Button btnNewMsg = (Button) findViewById(R.id.btnNewMsg);
 		final Activity current = this;
+		mYNewMsg = mNewMsg.getY();
 		btnNewMsg.setOnClickListener(new OnClickListener()
 		{
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-ge	nerated method stub
 				if( !bDisplayMsg )
 				{
 					mNewMsg.setVisibility(View.VISIBLE);
-					mNewMsg.setY(mNewMsg.getY() + 40);
-					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[1]));
+					if(mYNewMsg < 0.1f)
+					{
+						mYNewMsg = mNewMsg.getY() + 40.0f;
+						mNewMsg.setY(mYNewMsg);
+					}
+					else
+					{
+						if( !bClickedOnce )
+						{
+							mYNewMsg = mNewMsg.getY();
+							bClickedOnce = true;
+						}
+						mNewMsg.setY(mYNewMsg + 40.0f);
+					}
+					// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
+					btnNewMsg.setBackgroundDrawable(getResources().getDrawable(btnCenterBg[1]));
 					bDisplayMsg = true;
 
 					mHistoryLayout.hidePanel();
@@ -183,7 +200,8 @@ public class RadarActivity extends Activity
 						launchCircleAnimation(v);
 					}
 					//at end of wave trigger change of button
-					btnNewMsg.setBackground(getResources().getDrawable(btnCenterBg[0]));
+					// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
+					btnNewMsg.setBackgroundDrawable(getResources().getDrawable(btnCenterBg[0]));
 					bDisplayMsg = false;
 
 					mHistoryLayout.showPanel();
@@ -292,7 +310,8 @@ public class RadarActivity extends Activity
 	private void addNewCloseUser(String serverId, int tag)
 	{
 		Button user = new Button(getBaseContext());
-		user.setBackground(getResources().getDrawable(R.drawable.btn_close_user));
+		// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
+		user.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_close_user));
 		user.setLayoutParams(new LayoutParams(CLOSE_USER_DIM, CLOSE_USER_DIM));
 
 		Random fate = new Random();
@@ -450,7 +469,8 @@ public class RadarActivity extends Activity
 			if(user != null)
 			{
 				final Button notif = new Button(getBaseContext());
-				notif.setBackground(getResources().getDrawable(R.drawable.notification));
+				// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
+				notif.setBackgroundDrawable(getResources().getDrawable(R.drawable.notification));
 				int[] location = new int[2];
 				user.getLocationOnScreen(location);
 				notif.setX(location[0] - 30.0f);

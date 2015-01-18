@@ -44,11 +44,11 @@
                 android:scaleType="fitXY"
                 android:src="@drawable/btn_add_msg" />
 
+                <!-- unsupported by Android 4.0.3 in the EditText below : android:layout_alignParentStart="true" -->
             <EditText
                 android:id="@+id/txtNewMsg"
                 android:layout_width="fill_parent"
                 android:layout_height="?android:attr/actionBarSize"
-                android:layout_alignParentStart="true"
                 android:layout_below="@+id/btnNewMsg"
                 android:drawableStart="@drawable/logo_mini"
                 android:ems="10"
