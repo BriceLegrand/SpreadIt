@@ -14,6 +14,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -41,7 +42,9 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.spreadit.R;
 import com.spreadit.network.ComManager;
+import com.spreadit.network.MessageReceiver;
 import com.spreadit.radar.CirclesCanvasAnimation.Circle;
+import com.spreadit.splash.SplashScreen;
 import com.spreadit.utils.ActionItem;
 import com.spreadit.utils.QuickAction;
 
@@ -67,10 +70,11 @@ public class RadarActivity extends Activity
 	
 	private CirclesCanvasAnimation	mCirclesAnimation;
 	
+	private final BroadcastReceiver messageReceiver = new MessageReceiver(); 
+
 	private float					mYNewMsg;
 	
 	private boolean					bClickedOnce;
-	
 
 	public 	static final String 	SAVED_STATE_ACTION_BAR_HIDDEN 	= "saved_state_action_bar_hidden";
 	private static final String 	ACTION_BAR_TITLE_FONT 			= "fonts/intriquescript.ttf";
@@ -98,6 +102,10 @@ public class RadarActivity extends Activity
 		mComManager.setMainAct(this);
 		// AlarmManager pour réception des users
 		mComManager.startUsersAlarmManager();
+		
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("com.google.android.c2dm.intent.RECEIVE");
+		registerReceiver(messageReceiver, filter);
 
 		mainContent = (RelativeLayout) findViewById(R.id.mainContent);
 		
@@ -518,7 +526,7 @@ public class RadarActivity extends Activity
 						new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						mComManager.sendLogout();
-						RadarActivity.super.onDestroy();
+						finish();
 						System.exit(0);
 					}
 				})
@@ -536,6 +544,18 @@ public class RadarActivity extends Activity
 	{
 		buildQuitDialog();
 	}
+	
+	@Override 
+	public void onDestroy() {
+		super.onDestroy();
+		mComManager.sendLogout();
+		
+		unregisterReceiver(messageReceiver);
+		int pid = android.os.Process.myPid();
+		android.os.Process.killProcess(pid);
+	}
+	
+	
 	
 	public void launchCircleAnimation(View view)
 	{

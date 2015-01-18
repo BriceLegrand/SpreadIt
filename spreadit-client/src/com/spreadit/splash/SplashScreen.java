@@ -1,8 +1,10 @@
 package com.spreadit.splash;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -11,6 +13,7 @@ import android.widget.ImageView;
 
 import com.spreadit.R;
 import com.spreadit.network.ComManager;
+import com.spreadit.network.MessageReceiver;
 
 public class SplashScreen extends Activity
 {
@@ -22,6 +25,8 @@ public class SplashScreen extends Activity
 	
 	public static Context AppContext;
 	
+	private final BroadcastReceiver messageReceiver = new MessageReceiver(); 
+	
 	public static final int[] LOG_ICONS = { R.drawable.cross, R.drawable.valid };
 
 	@Override
@@ -32,6 +37,9 @@ public class SplashScreen extends Activity
 
 		AppContext = getApplicationContext();
 		
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("com.google.android.c2dm.intent.RECEIVE");
+		registerReceiver(messageReceiver, filter);
 		mImgConnexion = (ImageView) findViewById(R.id.imgCnx);
 		mImgGeoloc = (ImageView) findViewById(R.id.imgGeo);
 		
@@ -101,5 +109,11 @@ public class SplashScreen extends Activity
 	public void turnGeolocValid()
 	{
 		mImgGeoloc.setImageDrawable(getResources().getDrawable(LOG_ICONS[1]));
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		unregisterReceiver(messageReceiver);
 	}
 }
