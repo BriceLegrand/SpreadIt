@@ -32,6 +32,12 @@ public class MessageReceiver extends BroadcastReceiver
 				String valueServerId = messageOuNewUserEtServerId.substring(messageOuNewUserEtServerId.lastIndexOf('|') + 1);
 				intent2open.putExtra("new_user", valueServerId);
 			}
+			else if(key.equals("LOSTUSER"))
+			{
+				Log.d("tag","Lost user received from GCM " + messageOuNewUserEtServerId);
+				String valueServerId = messageOuNewUserEtServerId.substring(messageOuNewUserEtServerId.lastIndexOf('|') + 1);
+				intent2open.putExtra("lost_user", valueServerId);
+			}
 			else
 			{
 				Log.d("tag","Message received from GCM " + messageOuNewUserEtServerId);
