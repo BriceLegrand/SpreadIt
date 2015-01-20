@@ -582,6 +582,11 @@ public class RadarActivity extends Activity
 					{
 						mComManager.sendLogout();
 						unregisterReceiver(messageReceiver);
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 						RadarActivity.this.onDestroy();
 						//System.exit(0);
 					}
@@ -605,8 +610,8 @@ public class RadarActivity extends Activity
 	public void onDestroy() {
 		super.onDestroy();
 		
-		//int pid = android.os.Process.myPid();
-		//android.os.Process.killProcess(pid);
+		int pid = android.os.Process.myPid();
+		android.os.Process.killProcess(pid);
 	}
 	
 	public void launchCircleAnimation(View view)
