@@ -542,7 +542,7 @@ public class RadarActivity extends Activity
 						mComManager.sendLogout();
 						unregisterReceiver(messageReceiver);
 						RadarActivity.this.onDestroy();
-						System.exit(0);
+						//System.exit(0);
 					}
 				})
 				.setNegativeButton(R.string.cancelQuit,
@@ -564,8 +564,8 @@ public class RadarActivity extends Activity
 	public void onDestroy() {
 		super.onDestroy();
 		
-		int pid = android.os.Process.myPid();
-		android.os.Process.killProcess(pid);
+		//int pid = android.os.Process.myPid();
+		//android.os.Process.killProcess(pid);
 	}
 	
 	public void launchCircleAnimation(View view)
