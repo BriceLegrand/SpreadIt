@@ -82,6 +82,7 @@ public class RadarActivity extends Activity
 	private static final String		KEY_SERVERID					= "server_id";
 	private static final String		KEY_MESSAGE						= "msg";
 	private static final String		KEY_NEWUSER						= "new_user";
+	private static final String 	KEY_LOSTUSER 					= "lost_user";
 	private static final float 		ACTION_BAR_TITLE_SIZE 			= 37.0f;
 	private static final float 		SCREEN_X_MAX 					= 1000.0f;
 	private static final float		SCREEN_Y_MAX					= 1220.0f;
@@ -451,6 +452,7 @@ public class RadarActivity extends Activity
 		String lon = intent.getStringExtra(KEY_LONGITUDE);
 		
 		String newUser = intent.getStringExtra(KEY_NEWUSER);
+		String lostUser = intent.getStringExtra(KEY_LOSTUSER);
 		
 		final String currentMessage = intent.getStringExtra(KEY_MESSAGE);
 		final String currentServerId = intent.getStringExtra(KEY_SERVERID);
@@ -470,6 +472,7 @@ public class RadarActivity extends Activity
 				final Button notif = new Button(getBaseContext());
 				// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
 				notif.setBackgroundDrawable(getResources().getDrawable(R.drawable.notification));
+				//notif.setTag("userView" + tag);
 				int[] location = new int[2];
 				user.getLocationOnScreen(location);
 				notif.setX(location[0] - 30.0f);
@@ -515,6 +518,14 @@ public class RadarActivity extends Activity
 				addNewCloseUser(newUser, mCloseUsers.size());
 			}
 		}
+		else if (lostUser != null)
+		{
+			if( mCloseUsers.containsKey(lostUser) )
+			{
+				mainContent.removeView(mCloseUsers.get(lostUser));
+				mCloseUsers.remove(lostUser);
+			}
+		}
 
 		super.onNewIntent(intent);
 	}
@@ -526,7 +537,10 @@ public class RadarActivity extends Activity
 				"Êtes-vous sûr de vouloir quitter l'application ?")
 				.setPositiveButton(R.string.quitApp,
 						new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
+					public void onClick(DialogInterface dialog, int id)
+					{
+						mComManager.sendLogout();
+						unregisterReceiver(messageReceiver);
 						RadarActivity.this.onDestroy();
 						System.exit(0);
 					}
@@ -549,9 +563,7 @@ public class RadarActivity extends Activity
 	@Override 
 	public void onDestroy() {
 		super.onDestroy();
-		mComManager.sendLogout();
 		
-		unregisterReceiver(messageReceiver);
 		int pid = android.os.Process.myPid();
 		android.os.Process.killProcess(pid);
 	}
