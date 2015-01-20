@@ -46,6 +46,16 @@ public class SpreadItController {
 	@RequestMapping(value="/logout", method=RequestMethod.POST)
     @ResponseBody
     public String logout(@RequestParam("server_id") final int server_id) {
+        // send the server_id of this user to other connected users in the zone
+        List<User> users;
+        try {
+            users = SqlHandler.retrieve_users(server_id, Application.rayon_diffusion_km);
+            sendMsgToGcm(users, "LOSTUSER|"+server_id);
+        }
+        catch (Exception e) {
+            out.println("/logout : LOSTUSER update of other users failed "+e.getMessage()+" for server_id="+server_id);
+        }
+
         String result = "";
         try {
             SqlHandler.logout(server_id);
@@ -84,7 +94,7 @@ public class SpreadItController {
             sendMsgToGcm(users, "NEWUSER|"+server_id);
         }
         catch (Exception e) {
-            out.println("/position : update of other users failed "+e.getMessage()+" for server_id="+server_id);
+            out.println("/position : NEWUSER update of other users failed "+e.getMessage()+" for server_id="+server_id);
         }
 
         return result;
