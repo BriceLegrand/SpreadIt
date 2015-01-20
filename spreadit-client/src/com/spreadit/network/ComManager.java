@@ -413,10 +413,9 @@ public class ComManager implements AsyncResponse {
 
 	@Override
 	public void processSendLogoutFinish() {
-		// TODO Auto-generated method stub
 		Log.d("tag", "send logout finished");
+		this.getMainAct().finish();
 		locManager.stopLocationTracking();
-
 	}
 
 	public void processGetSurroundingUsersFinish(String response) {
