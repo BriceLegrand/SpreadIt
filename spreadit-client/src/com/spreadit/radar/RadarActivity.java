@@ -510,7 +510,10 @@ public class RadarActivity extends Activity
 		//		Case 3 : A new user is located
 		else if (newUser != null)
 		{
-			addNewCloseUser(newUser, mCloseUsers.size());
+			if( !mCloseUsers.containsKey(newUser) )
+			{
+				addNewCloseUser(newUser, mCloseUsers.size());
+			}
 		}
 
 		super.onNewIntent(intent);
