@@ -90,7 +90,7 @@ public class ComManager implements AsyncResponse {
 	public void startUsersAlarmManager() {
 		mAlarmMgrUsers = (AlarmManager) mContext
 				.getSystemService(Context.ALARM_SERVICE);
-		long duration = 1000 * 60 * 5;
+		long duration = 1000 * 60 * 1;
 		mAlarmMgrUsers.setInexactRepeating(
 				AlarmManager.ELAPSED_REALTIME_WAKEUP, duration, duration,
 				mAlarmIntentUsers);
@@ -265,8 +265,7 @@ public class ComManager implements AsyncResponse {
 	 * @return Application's {@code SharedPreferences}.
 	 */
 	private SharedPreferences getGCMPreferences(Context context) {
-		// This sample app persists the registration ID in shared preferences,
-		// but
+		// This sample app persists the registration ID in shared preferences, but
 		// how you store the regID in your app is up to you.
 		return mContext.getSharedPreferences(
 				RadarActivity.class.getSimpleName(), Context.MODE_PRIVATE);
