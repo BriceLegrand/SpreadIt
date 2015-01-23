@@ -13,10 +13,11 @@ public class DimensionsUtils
 	 * @param context Context to get resources and device specific display metrics
 	 * @return A float value to represent dp equivalent to px value
 	 */
-	public static float convertPixelsToDp(float px, Context context){
-	    Resources resources = context.getResources();
-	    DisplayMetrics metrics = resources.getDisplayMetrics();
-	    float dp = px / (metrics.densityDpi / 160f);
-	    return dp;
+	public static float convertPixelsToDp(float px, Context context)
+	{
+		Resources resources = context.getResources();
+		DisplayMetrics metrics = resources.getDisplayMetrics();
+		float dp = px / (metrics.densityDpi / 160f);
+		return dp;
 	}
 }
