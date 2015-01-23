@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -51,6 +52,7 @@ import com.spreadit.network.ComManager;
 import com.spreadit.network.MessageReceiver;
 import com.spreadit.radar.CirclesCanvasAnimation.Circle;
 import com.spreadit.utils.ActionItem;
+import com.spreadit.utils.ClearCacheDataUtils;
 import com.spreadit.utils.QuickAction;
 
 public class RadarActivity extends Activity 
@@ -513,7 +515,7 @@ public class RadarActivity extends Activity
 				final Button notif = new Button(getBaseContext());
 				// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
 				notif.setBackgroundDrawable(getResources().getDrawable(R.drawable.notification));
-				//notif.setTag("userView" + tag);
+				notif.setTag("notifUser" + currentServerId);
 				int[] location = new int[2];
 				user.getLocationOnScreen(location);
 				notif.setX(location[0] - 30.0f);
@@ -565,6 +567,11 @@ public class RadarActivity extends Activity
 			{
 				mainContent.removeView(mCloseUsers.get(lostUser));
 				mCloseUsers.remove(lostUser);
+				View v = mainContent.findViewWithTag("notifUser" + lostUser);
+				if(v != null)
+				{
+					mainContent.removeView(v);
+				}
 			}
 		}
 
@@ -607,7 +614,13 @@ public class RadarActivity extends Activity
 	}
 	
 	@Override 
-	public void onDestroy() {
+	public void onDestroy() 
+	{
+		Editor editor = getSharedPreferences("clear_cache", Context.MODE_PRIVATE).edit();
+		editor.clear();
+		editor.commit();
+		ClearCacheDataUtils.getInstance().trimCache();
+		
 		super.onDestroy();
 		
 		int pid = android.os.Process.myPid();
@@ -618,7 +631,7 @@ public class RadarActivity extends Activity
 	{
 		final Collection<Circle> circles = new ArrayList<Circle>();
 		final int minRadiusMaxValue = Math.min(mAnimationView.getMeasuredWidth(), mAnimationView.getMeasuredHeight());
-		for (int i = 0; i < 5; i ++)
+		for (int i = 0; i < 5; ++i)
 		{
 			final int x = mAnimationView.getMeasuredWidth()/2;
 			final int y = mAnimationView.getMeasuredHeight()/2 - getActionBar().getHeight()/2;
@@ -649,7 +662,8 @@ public class RadarActivity extends Activity
 		}
 	}
 	
-	public void setTagsInSpinner() {
+	public void setTagsInSpinner() 
+	{
 		//Parse list view to get hashtags
 		List<String> tagList = new ArrayList<String>();
 		for(int i=0 ; i<mHistoryAdapter.getCount() ; i++){
@@ -676,11 +690,13 @@ public class RadarActivity extends Activity
         s.setAdapter(newAdapter);
 	}
 	
-	public void filterList(String tag) {
+	public void filterList(String tag) 
+	{
 		List<String> filteredValues = new ArrayList<String>();
 		for(int i=0 ; i<mHistoryAdapter.getCount() ; i++){
 			String value = mHistoryAdapter.getItem(i).toString();
-			if (value.contains(tag)) {
+			if (value.contains(tag)) 
+			{
 				filteredValues.add(value);
 			}
 		}
