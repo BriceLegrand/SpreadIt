@@ -423,11 +423,11 @@ public class RadarActivity extends Activity
 			}
 			return true;
 		}
-		case R.id.action_filter:
-		{
-			Toast.makeText(getApplicationContext(), "Filters on", Toast.LENGTH_SHORT).show();
-			return true;
-		}
+//		case R.id.action_filter:
+//		{
+//			Toast.makeText(getApplicationContext(), "Filters on", Toast.LENGTH_SHORT).show();
+//			return true;
+//		}
 		case R.id.action_settings: 
 		{
 			return true;
@@ -619,7 +619,7 @@ public class RadarActivity extends Activity
 		Editor editor = getSharedPreferences("clear_cache", Context.MODE_PRIVATE).edit();
 		editor.clear();
 		editor.commit();
-		ClearCacheDataUtils.getInstance().trimCache();
+		ClearCacheDataUtils.trimCache(getApplicationContext());
 		
 		super.onDestroy();
 		
