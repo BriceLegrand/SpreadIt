@@ -205,9 +205,14 @@ public class RadarActivity extends Activity
 					{
 						//send the message
 						mComManager.sendMessage(mNewMsg.getText().toString());
-						mNewMsg.setText("");
 						//start the wave
 						launchCircleAnimation(v);
+						//Update history
+						if(mHistoryAdapter.getPosition(mNewMsg.getText().toString()) == -1)
+						{
+							mHistoryAdapter.add(mNewMsg.getText().toString());
+						}
+						mNewMsg.setText("");
 					}
 					//at end of wave trigger change of button
 					// setBackground not present in Android 4.0.3, changed to setBackgroundDrawable
