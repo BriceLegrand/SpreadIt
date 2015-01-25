@@ -24,7 +24,7 @@ public class MessageReceiver extends BroadcastReceiver
 		intent2open.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		if(messageOuNewUserEtServerId != null)
 		{
-			String key = messageOuNewUserEtServerId.substring(0, messageOuNewUserEtServerId.lastIndexOf('|'));
+			String key = messageOuNewUserEtServerId.substring(0, messageOuNewUserEtServerId.indexOf('|'));
 			String nameServerId = "server_id";
 			if(key.equals("NEWUSER"))
 			{
@@ -38,11 +38,14 @@ public class MessageReceiver extends BroadcastReceiver
 				String valueServerId = messageOuNewUserEtServerId.substring(messageOuNewUserEtServerId.lastIndexOf('|') + 1);
 				intent2open.putExtra("lost_user", valueServerId);
 			}
-			else
+			else if(key.equals("MSG"))
 			{
 				Log.d("tag","Message received from GCM " + messageOuNewUserEtServerId);
 				String valueMsg = messageOuNewUserEtServerId.substring(messageOuNewUserEtServerId.lastIndexOf('|') + 1);
-				intent2open.putExtra(nameServerId, key);
+				String valueServerId = 
+						messageOuNewUserEtServerId
+						.substring(messageOuNewUserEtServerId.indexOf('|') + 1, messageOuNewUserEtServerId.lastIndexOf('|'));
+				intent2open.putExtra(nameServerId, valueServerId);
 				intent2open.putExtra(nameMsg, valueMsg);
 			}
 			context.startActivity(intent2open);
